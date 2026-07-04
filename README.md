@@ -152,7 +152,14 @@ Uygulama mikrosaniye (`μs`) cinsinden ham IR dizileri (raw pattern) kullanır. 
 
 ## Xiaomi / MIUI / HyperOS Uyarısı
 
-Xiaomi / Redmi / POCO cihazlarda sistemin agresif pil yöneticisinin uygulamanızı kapatmaması için:
+### 1. ADB / USB Üzerinden Uygulama Yükleme (Geliştirici Seçenekleri)
+Xiaomi, Redmi veya POCO cihazlara bilgisayardan (`flutter run` veya ADB ile) APK yüklerken `INSTALL_FAILED_USER_RESTRICTED` hatası almamak için **Geliştirici Seçenekleri**'nde şu iki ayar mutlaka açılmalıdır:
+* ✅ **USB üzerinden yükle** (*Install via USB*)
+* ✅ **USB hata ayıklama (Güvenlik ayarları)** (*USB debugging (Security settings)*) — *(Not: Açılırken Xiaomi hesabı şifresi veya 3 adımda 5 saniyelik güvenlik uyarıları sorabilir, kabul edin).*
+* ⚠️ **Önemli:** Yükleme komutu verildikten sonra telefon ekranı açık tutulmalı ve ekranda beliren 10 saniyelik "USB üzerinden yüklemeye izin verilsin mi?" uyarı penceresine **Yükle / İzin Ver** denilmelidir.
+
+### 2. Arka Plan Güç Yönetimi (Doze Mode Koruması)
+Sistemin agresif pil yöneticisinin arka planda çalışan zamanlayıcıları sonlandırmaması için:
 1. **Otomatik Başlatma (Autostart):** Açık hale getirin.
 2. **Pil Tasarrufu:** "Kısıtlama Yok" olarak seçin.
 > Uygulama içindeki **"Otomatik Başlatma Ayarları"** butonuna dokunarak doğrudan ilgili ayar sayfasına gidebilirsiniz.
@@ -304,7 +311,14 @@ The app communicates using raw IR microsecond (`μs`) timing patterns over a 38 
 
 ## Xiaomi / MIUI / HyperOS Warning
 
-To prevent MIUI / HyperOS from killing background timers on Xiaomi, Redmi, or POCO devices:
+### 1. ADB / USB Installation (Developer Options)
+To prevent `INSTALL_FAILED_USER_RESTRICTED` errors when installing the APK via ADB or `flutter run` on Xiaomi, Redmi, or POCO devices, you must enable two settings under **Developer Options**:
+* ✅ **Install via USB** (*USB üzerinden yükle*)
+* ✅ **USB debugging (Security settings)** (*USB hata ayıklama (Güvenlik ayarları)*) — *(Note: MIUI may prompt for your Xiaomi account password or display three 5-second security warnings; accept them).*
+* ⚠️ **Important:** Keep your phone screen unlocked during installation and tap **Install / Allow** on the 10-second confirmation pop-up that appears on your device.
+
+### 2. Background Power Management (Doze Protection)
+To prevent MIUI / HyperOS from killing background timers during deep sleep:
 1. **Autostart:** Enable IR AC Timer in system Autostart settings.
 2. **Battery Saver:** Set to "No restrictions".
 > Tap the **"Open Autostart Settings"** button inside the app to jump directly to the relevant MIUI settings page.
