@@ -874,7 +874,12 @@ class _MainScreenState extends State<MainScreen>
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(icon, size: 16, color: sel ? AppColors.accent : AppColors.textDim),
             const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: sel ? AppColors.textPrimary : AppColors.textDim)),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(label, maxLines: 1, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: sel ? AppColors.textPrimary : AppColors.textDim)),
+              ),
+            ),
           ]),
         ),
       ),
@@ -1098,7 +1103,12 @@ class _MainScreenState extends State<MainScreen>
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(icon, color: Colors.white, size: 20),
           const SizedBox(width: 10),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(label, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+            ),
+          ),
         ]),
       ),
     );
