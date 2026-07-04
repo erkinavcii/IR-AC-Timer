@@ -1,29 +1,35 @@
 # IR AC Timer
 
-> **Ayarla & Unut** — Kızılötesi vericili Android cihazlar için hafif, güvenilir klima kapatma zamanlayıcısı.
+<div align="center">
+
+**[🇹🇷 Türkçe](#türkçe) | [🇬🇧 English](#english)**
+
+> **Ayarla & Unut / Set & Forget** — Kızılötesi vericili Android cihazlar için hafif, güvenilir klima kapatma zamanlayıcısı.  
+> Lightweight, reliable AC shutdown timer for Android devices with infrared (IR) emitters.
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android)](https://developer.android.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+</div>
+
 ---
 
-## İçindekiler
+<a name="türkçe"></a>
+# 🇹🇷 Türkçe Dokümantasyon
 
+## İçindekiler (TR)
 - [Genel Bakış](#genel-bakış)
+- [Ekran Görüntüleri](#ekran-görüntüleri)
 - [Özellikler](#özellikler)
 - [Nasıl Çalışır](#nasıl-çalışır)
 - [Gereksinimler](#gereksinimler)
 - [Kurulum ve Derleme](#kurulum-ve-derleme)
-- [Proje Yapısı](#proje-yapısı)
 - [Zamanlama Modları](#zamanlama-modları)
 - [Klima Profilleri (IR Kodları)](#klima-profilleri-ir-kodları)
 - [İzin Yönetimi](#i̇zin-yönetimi)
 - [Xiaomi / MIUI / HyperOS Uyarısı](#xiaomi--miui--hyperos-uyarısı)
 - [Mimari Kararlar](#mimari-kararlar)
-- [Yerelleştirme (TR / EN)](#yerelleştirme-tr--en)
-- [Bilinen Kısıtlamalar](#bilinen-kısıtlamalar)
-- [Katkıda Bulunma](#katkıda-bulunma)
 
 ---
 
@@ -36,6 +42,15 @@
 3. **Başlat**'a basın, telefonu bırakın.
 
 Telefon derin uyku (Doze Mode) moduna geçse bile, Android'in `AlarmManager.setExactAndAllowWhileIdle()` API'si sayesinde IR sinyali tam zamanında gönderilir.
+
+---
+
+## Ekran Görüntüleri
+
+| Geri Sayım Kurulumu | Döngü Modu & Saatler | Aktif Görev (Glow Ring) | Klima Profilleri |
+|:---:|:---:|:---:|:---:|
+| *(Ekran görüntüsü eklenecek)* | *(Ekran görüntüsü eklenecek)* | *(Ekran görüntüsü eklenecek)* | *(Ekran görüntüsü eklenecek)* |
+| `docs/ss_countdown.png` | `docs/ss_cycle.png` | `docs/ss_active.png` | `docs/ss_profiles.png` |
 
 ---
 
@@ -52,7 +67,7 @@ Telefon derin uyku (Doze Mode) moduna geçse bile, Android'in `AlarmManager.setE
 | 🧪 **Test Modu** | Kaydetmeden önce sinyali anlık olarak test edin |
 | 🌍 **TR / EN Dil Desteği** | Anlık dil geçişi, yeniden başlatma gerektirmez |
 | 🔋 **Doze Mode Uyumlu** | `setExactAndAllowWhileIdle` + `RECEIVE_BOOT_COMPLETED` |
-| 🔄 **Yeniden Başlatma Sonrası Geri Yükleme** | Telefon yeniden başlasa bile aktif görev devam eder |
+| 🔄 **Yeniden Başlatma Geri Yükleme** | Telefon yeniden başlasa bile aktif görev devam eder |
 | 🌑 **AMOLED Koyu Tema** | Saf siyah arka plan, düşük pil tüketimi |
 
 ---
@@ -67,7 +82,7 @@ Flutter UI (Dart)
 MainActivity.kt
   ├── scheduleTask()   →  AlarmManager.setExactAndAllowWhileIdle()
   ├── cancelTask()     →  AlarmManager.cancel() + Bildirim temizleme
-  └── transmitIr()    →  ConsumerIrManager.transmit(38kHz, pattern[])
+  └── transmitIr()     →  ConsumerIrManager.transmit(38kHz, pattern[])
 
 AlarmManager (System)
       │ Doze Mode'da bile tetiklenir
@@ -88,79 +103,18 @@ BootReceiver.kt (BOOT_COMPLETED)
 
 ## Gereksinimler
 
-### Donanım
-- **IR Verici (blaster)** olan bir Android cihaz gereklidir.
-  - Xiaomi Redmi Note serileri ✅
-  - Huawei P/Mate serileri ✅
-  - Samsung Galaxy S4-S6 ✅ (sonraki modellerde kaldırıldı)
-  - OnePlus 2, HTC One serileri ✅
-
-> ⚠️ Cihazınızın IR vericisi olup olmadığını uygulama açılışında otomatik kontrol eder. "IR Emitter: YOK" görünüyorsa cihaz desteklenmiyordur.
-
-### Yazılım
-| Bileşen | Minimum Versiyon |
-|---------|-----------------|
-| Android SDK | API 24 (Android 7.0) |
-| Flutter SDK | 3.0+ |
-| Kotlin | 1.8+ |
-| Gradle | 8.x |
+- **Donanım:** Kızılötesi vericisi (IR Blaster) olan Android cihaz (Xiaomi Redmi/POCO, Huawei P/Mate serisi vb.).
+- **Yazılım:** Android 7.0+ (API 24+). Android 12+ için "Hassas Zamanlama" (Exact Alarm) izni gereklidir.
 
 ---
 
 ## Kurulum ve Derleme
 
-### 1. Repo'yu Klonla
-
 ```bash
-git clone https://github.com/kullaniciadi/IR-AC-Timer.git
+git clone https://github.com/erkinavcii/IR-AC-Timer.git
 cd IR-AC-Timer
-```
-
-### 2. Bağımlılıkları Yükle
-
-```bash
 flutter pub get
-```
-
-### 3. Debug APK Derle
-
-```bash
-flutter build apk --debug
-# Çıktı: build/app/outputs/flutter-apk/app-debug.apk
-```
-
-### 4. Release APK Derle (imzalama gerektirir)
-
-```bash
-flutter build apk --release
-```
-
-### 5. Bağlı Cihaza Yükle
-
-```bash
-flutter run
-```
-
----
-
-## Proje Yapısı
-
-```
-IR-AC-Timer/
-├── lib/
-│   ├── main.dart                    # UI, state management, MethodChannel çağrıları
-│   └── l10n/
-│       └── app_strings.dart         # Tüm TR/EN çeviriler (tek dosya)
-│
-├── android/app/src/main/
-│   ├── AndroidManifest.xml          # İzinler ve receiver tanımları
-│   └── kotlin/com/example/ir_ac_timer/ir_ac_timer/
-│       ├── MainActivity.kt          # MethodChannel handler, scheduleTask, cancelTask
-│       ├── AlarmReceiver.kt         # IR tetikleyici, döngü/recurring yeniden planlama
-│       ├── BootReceiver.kt          # Reboot sonrası görev geri yükleme
-│       └── NotificationHelper.kt   # Sonsuz döngü bildirimi yönetimi
-│
-└── README.md
+flutter build apk --debug   # Çıktı: build/app/outputs/flutter-apk/app-debug.apk
 ```
 
 ---
@@ -168,217 +122,202 @@ IR-AC-Timer/
 ## Zamanlama Modları
 
 ### 1. Geri Sayım Modu (`countdown`)
-
-Belirtilen süre sonunda tek bir IR sinyali gönderir ve görev tamamlanır.
-
-**Kullanım:**
-- Hızlı seçim: 15m, 30m, 1s, 1.5s, 2s, 3s, 4s
-- Özel süre: Saat + Dakika tekerleği ile
-
-**Örnek senaryo:** "30 dakika sonra klimayı kapat, uyumak istiyorum."
-
----
+Belirtilen süre sonunda tek bir IR sinyali gönderir ve görev tamamlanır. Hızlı seçim chipleri (15m, 30m, 1h...) veya tekerlekli saat/dakika seçici ile ayarlanabilir.
 
 ### 2. Zamanlı Mod (`recurring`)
-
-Her gün belirli bir saatte IR sinyali gönderir. Siz iptal edene kadar tekrarlar.
-
-**Kullanım:** Saat:Dakika tekerleğiyle kapatma saati seç.
-
-**Örnek senaryo:** "Klima her gece 03:00'da kapansın."
-
-**Not:** Sinyal saati geçmişse ertesi güne planlanır.
-
----
+Her gün belirlenen saatte IR sinyali gönderir. Kapatılana kadar günlük olarak kendini tekrar eder.
 
 ### 3. Döngü Modu (`cycle`)
-
-Belirli aralıklarla tekrarlayan IR sinyalleri gönderir.
-
-**Parametreler:**
-
-| Parametre | Açıklama | Varsayılan |
-|-----------|----------|-----------|
-| **Aralık** | Kaç dakikada bir sinyal (1-120 dk) | 30 dk |
-| **Başlangıç Saati** | Opsiyonel — girilmezse hemen başlar | Şu an |
-| **Bitiş Saati** | Opsiyonel — girilmezse sonsuz tekrar | Süresiz |
-
-**Örnek senaryolar:**
-
-| Senaryo | Ayar |
-|---------|------|
-| "Şimdi başla, 30dk'da bir kapat, sabah 9'a kadar" | Aralık: 30m · Başlangıç: kapalı · Bitiş: 09:00 |
-| "Gece 23:00'dan itibaren her saatte bir kapat" | Aralık: 60m · Başlangıç: 23:00 · Bitiş: kapalı |
-| "Hemen başla, sonsuz tekrar et" | Aralık: 30m · İkisi de kapalı |
-
-**Sonsuz döngü bildirimi:**
-> Bitiş saati belirtilmeden başlatılan döngülerde bildirim panelinde kalıcı bir uyarı görünür. Uygulamayı açmadan hatırlatma sağlar.
+Belirli aralıklarla (örn: her 30 dakikada bir) tekrarlayan sinyaller gönderir.
+- **Başlangıç Saati (Opsiyonel):** Kapalıysa hemen başlar. Açıksa belirlenen saatte ilk sinyali gönderip döngüye girer.
+- **Bitiş Saati (Opsiyonel):** Kapalıysa süresiz çalışır (bildirim panelinde uyarı verir). Açıksa belirtilen saatte otomatik durur.
 
 ---
 
 ## Klima Profilleri (IR Kodları)
 
-Uygulama, ham IR sinyal dizisi (raw μs pattern) kullanır. Her sinyal `[HIGH, LOW, HIGH, LOW, ...]` formatında mikrosaniye değerlerinden oluşur ve 38 kHz taşıyıcı frekansıyla iletilir.
-
-### Dahili Ön Ayarlar
-
-| Marka | Durum |
-|-------|-------|
-| LG / Beko / Arçelik | ✅ Dahili |
-| Samsung | ✅ Dahili |
-| Daikin | ✅ Dahili |
-| Dummy / Test | ✅ Dahili (kısa test sinyali) |
-
-> ⚠️ Bu kodlar yalnızca **KAPATMA (OFF)** sinyali içindir. Klimanızın tam olarak kapanması için doğru sinyal kodunu kullanmanız gerekir.
-
-### Kendi IR Kodunuzu Eklemek
-
-1. Klimanızın model numarasıyla [IRDB](https://github.com/probonopd/irdb) veya [LIRC Remote](http://lirc-remotes.sourceforge.net/) sitelerinden `.lircd` formatında kodu bulun.
-2. Raw μs değerlerini virgülle ayrılmış formata dönüştürün.
-3. Uygulamada **Klima Profilleri → Yeni Profil Ekle** ile girin.
-4. **Sinyali Test Et** butonuyla klimanızın kapandığını doğrulayın.
-5. **Kaydet** ile aktif profil olarak ayarlayın.
-
-### Ham Kod Formatı
-
-```
-9000, 4500, 560, 560, 560, 1680, 560, 560, ...
-```
-
-- Pozitif değerler = IR LED açık süresi (μs)  
-- Tüm değerler pozitif — HIGH/LOW sıralaması codec tarafından otomatik yapılır
-- Minimum 4, maksimum birkaç yüz değer
+Uygulama mikrosaniye (`μs`) cinsinden ham IR dizileri (raw pattern) kullanır. 38 kHz taşıyıcı frekansıyla iletilir.
+* **Dahili Profiller:** LG / Beko / Arçelik, Samsung, Daikin, Dummy/Test.
+* **Özel Profil Ekleme:** [IRDB](https://github.com/probonopd/irdb) veya benzeri kaynaklardan bulduğunuz raw μs değerlerini virgülle ayırarak (örn: `9000, 4500, 560, 560...`) yeni profil olarak ekleyebilirsiniz.
 
 ---
 
 ## İzin Yönetimi
 
-Uygulama açılışında üç kritik izni kontrol eder:
-
-### 1. Hassas Zamanlama (`SCHEDULE_EXACT_ALARM`)
-
-Android 12+ (API 31+) için gerekli. Bu izin olmadan `setExactAndAllowWhileIdle()` `SecurityException` fırlatır.
-
-**Kontrol:** `AlarmManager.canScheduleExactAlarms()`  
-**Yönlendirme:** Ayarlar → Uygulamalar → IR AC Timer → Alarmlar ve hatırlatıcılar
-
-### 2. Pil Optimizasyonundan Muafiyet (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`)
-
-Doze Mode'da `AlarmReceiver`'ın arka planda tetiklenebilmesi için gerekli.
-
-**Kontrol:** `PowerManager.isIgnoringBatteryOptimizations()`  
-**Yönlendirme:** Sistem diyaloğu otomatik açılır
-
-### 3. Bildirim İzni (`POST_NOTIFICATIONS`)
-
-Android 13+ (API 33+) için, sonsuz döngü bildirimini gösterebilmek için gerekli.
-
-**Not:** Bu izin olmadan sonsuz döngü çalışmaya devam eder, yalnızca bildirim gösterilmez.
-
-### İzin Durumu Göstergesi
-
-Ana ekranın üst kısmındaki 3 kutucuk izin durumlarını gösterir. Turuncu renkli kutu bir eksiklik var demektir; üstüne dokunarak ilgili ayar sayfası açılır.
+1. **Hassas Zamanlama (`SCHEDULE_EXACT_ALARM`):** Android 12+ için alarmların tam zamanında tetiklenmesini sağlar.
+2. **Pil Optimizasyonundan Muafiyet:** Telefon derin uykuyorken (Doze Mode) arka plan görevinin durdurulmasını engeller.
+3. **Bildirim İzni (`POST_NOTIFICATIONS`):** Android 13+ üzerinde sonsuz döngü uyarı bildiriminin gösterilmesi için gereklidir.
 
 ---
 
 ## Xiaomi / MIUI / HyperOS Uyarısı
 
-Xiaomi cihazları (Redmi, POCO dahil) agresif bir pil yöneticisi kullanır. Sistem izinleri tam verilmiş olsa bile arka plan görevleri sonlandırılabilir.
-
-**Yapılması gerekenler:**
-
-1. **Otomatik Başlatma:** Ayarlar → Pil → Otomatik Başlatma → IR AC Timer: **Açık**
-2. **Pil Tasarrufu:** Ayarlar → Pil → Pil Tasarrufu → IR AC Timer: **Kısıtlama yok**
-3. **Arka Plan Etkinliği:** Uygulama Bilgisi → Pil → Arka Plan kısıtlaması: **Yok**
-
-Uygulama içinde **"Otomatik Başlatma Ayarları"** butonuna dokunarak MIUI'nin ilgili ekranına doğrudan yönlendirilebilirsiniz.
+Xiaomi / Redmi / POCO cihazlarda sistemin agresif pil yöneticisinin uygulamanızı kapatmaması için:
+1. **Otomatik Başlatma (Autostart):** Açık hale getirin.
+2. **Pil Tasarrufu:** "Kısıtlama Yok" olarak seçin.
+> Uygulama içindeki **"Otomatik Başlatma Ayarları"** butonuna dokunarak doğrudan ilgili ayar sayfasına gidebilirsiniz.
 
 ---
 
 ## Mimari Kararlar
 
-### Neden Flutter + Native Kotlin?
+* **Flutter + Native Kotlin:** UI hızlı ve esnek geliştirme için Flutter ile; IR donanım erişimi ve arka plan zamanlayıcıları ise güvenilirlik için doğrudan native Kotlin ile yazılmıştır.
+* **Neden WorkManager Değil?** WorkManager periyodik görevlerde minimum 15 dakika kısıtlaması ve Doze Mode gecikmesi uygular. Saniyesi saniyesine hassasiyet için `AlarmManager.setExactAndAllowWhileIdle()` kullanılmıştır.
 
-| Kısım | Teknoloji | Gerekçe |
-|-------|-----------|---------|
-| UI | Flutter (Dart) | Hızlı geliştirme, platform bağımsız |
-| IR iletimi | Kotlin (ConsumerIrManager) | Flutter'da doğrudan API erişimi yok |
-| Zamanlama | Kotlin (AlarmManager) | WorkManager Doze Mode'da güvenilir değil |
-| Depolama | Android SharedPreferences | Minimal, process ölümünden sonra hayatta kalır |
+---
+---
 
-### Neden WorkManager değil AlarmManager?
+<a name="english"></a>
+# 🇬🇧 English Documentation
 
-`WorkManager`'ın `PeriodicWorkRequest` sınıfı 15 dakika minimum aralık kısıtlaması ve Doze Mode gecikmesi içerir. `AlarmManager.setExactAndAllowWhileIdle()` ise zaman hassasiyetini garanti eder — bu uygulama için kritiktir.
+## Table of Contents (EN)
+- [Overview](#overview)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [How It Works](#how-it-works)
+- [Requirements](#requirements)
+- [Installation & Build](#installation--build)
+- [Scheduling Modes](#scheduling-modes)
+- [AC Profiles (IR Codes)](#ac-profiles-ir-codes)
+- [Permission Management](#permission-management)
+- [Xiaomi / MIUI / HyperOS Warning](#xiaomi--miui--hyperos-warning)
+- [Architectural Decisions](#architectural-decisions)
 
-### Döngü Modunun Çalışma Prensibi
+---
 
-Döngü modu bir `setInterval` değil, **kendi kendini yeniden planlayan** tek alarmlar zinciridir:
+## Overview
+
+**IR AC Timer** is a "Set & Forget" Android application designed to automatically shut off your air conditioner while you sleep or leave the room. The workflow is simple:
+
+1. Point your phone's IR blaster toward your air conditioner.
+2. Set the shutdown timer, daily alarm, or repeat cycle in the app.
+3. Tap **Start**, and leave your phone.
+
+Even if your phone enters deep Doze Mode, Android's native `AlarmManager.setExactAndAllowWhileIdle()` API guarantees that the IR signal is transmitted at the exact scheduled timestamp.
+
+---
+
+## Screenshots
+
+| Countdown Setup | Cycle Mode & Times | Active Task (Glow Ring) | AC Profiles |
+|:---:|:---:|:---:|:---:|
+| *(Screenshot to be added)* | *(Screenshot to be added)* | *(Screenshot to be added)* | *(Screenshot to be added)* |
+| `docs/ss_countdown.png` | `docs/ss_cycle.png` | `docs/ss_active.png` | `docs/ss_profiles.png` |
+
+---
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| 🕐 **Countdown Mode** | "Turn off after X minutes/hours" — one-time execution |
+| ⏰ **Scheduled Mode** | Shuts off the AC daily at a specific clock time |
+| 🔁 **Cycle Mode** | Sends IR signals every X minutes, with optional start and end times |
+| 📱 **Persistent Notification** | Displays an ongoing warning in the status bar during indefinite cycles |
+| 📡 **Multi-Brand Profiles** | Built-in presets for LG/Beko/Arçelik, Samsung, Daikin, and custom profiles |
+| ✏️ **Raw IR Code Editor** | Edit and store raw μs timing patterns for any AC model |
+| 🧪 **Test Transmission** | Instantly test IR codes before saving |
+| 🌍 **TR / EN Localization** | Instant bilingual UI switching without restarting the app |
+| 🔋 **Doze Mode Compatible** | Uses `setExactAndAllowWhileIdle` + `RECEIVE_BOOT_COMPLETED` |
+| 🔄 **Reboot Recovery** | Active tasks are restored seamlessly after device reboot |
+| 🌑 **AMOLED Dark Theme** | Pure black background for minimum battery consumption |
+
+---
+
+## How It Works
 
 ```
-[Alarm tetiklenir]
+Flutter UI (Dart)
       │
-      ├── IR sinyali gönder
-      ├── Bitiş zamanı kontrol et
-      │     ├── Geçti → SharedPreferences temizle, bildirim kapat
-      │     └── Geçmedi → now + interval için yeni alarm kur, bildirim güncelle
-      └── [döngü devam eder]
-```
+      │  MethodChannel  "com.example.ir_ac_timer/ir"
+      ▼
+MainActivity.kt
+  ├── scheduleTask()   →  AlarmManager.setExactAndAllowWhileIdle()
+  ├── cancelTask()     →  AlarmManager.cancel() + Clear notification
+  └── transmitIr()     →  ConsumerIrManager.transmit(38kHz, pattern[])
 
-Bu yaklaşım, sistem tarafından `setRepeating()` veya `PeriodicWorkRequest`'ten çok daha güvenilir şekilde handle edilir.
+AlarmManager (System)
+      │ Fires reliably even in Doze Mode
+      ▼
+AlarmReceiver.kt (BroadcastReceiver)
+  ├── ConsumerIrManager.transmit() → Transmit IR signal
+  ├── mode == "countdown"  → Clear SharedPreferences
+  ├── mode == "recurring"  → Reschedule for the next day
+  └── mode == "cycle"
+        ├── endEpoch == 0   → Indefinite: reschedule + update notification
+        └── endEpoch > now  → Expired: clear task + dismiss notification
 
----
-
-## Yerelleştirme (TR / EN)
-
-Tüm kullanıcıya görünen metinler `lib/l10n/app_strings.dart` dosyasında merkezileştirilmiştir.
-
-```dart
-// Kullanım
-AppStrings.get('startTimer')  // → "ZAMANLAYICIYI BAŞLAT" veya "START TIMER"
-
-// Dil değiştirme (anlık, yeniden başlatma gerektirmez)
-MyApp.langNotifier.value = 'en';
-```
-
-**Mimari not:** Küçük/orta ölçekli uygulamalar için ARB + `flutter_localizations` paketinin ek karmaşıklığı yerine tek dosya yaklaşımı tercih edilmiştir. 5'ten fazla dil eklenmesi gerektiğinde `gen-l10n` altyapısına geçiş önerilir.
-
-Yeni çeviri eklemek için `app_strings.dart` dosyasındaki `_t` map'ine satır eklemeniz yeterlidir:
-
-```dart
-'myNewKey': {'tr': 'Türkçe metin', 'en': 'English text'},
+BootReceiver.kt (BOOT_COMPLETED)
+  └── Read task from SharedPreferences → Restore in AlarmManager
 ```
 
 ---
 
-## Bilinen Kısıtlamalar
+## Requirements
 
-| Kısıtlama | Neden | Geçici Çözüm |
-|-----------|-------|-------------|
-| Yalnızca **KAPATMA** sinyali | Klima durumuna göre değişen kompleks state yönetimi gerektirir | Sinyal kodu olarak klimanızın kapatma kodunu girin |
-| ESP32 / Wi-Fi IR desteklenmiyor | Ağ yığını ve gecikme yönetimi ekler, farklı proje gerektirir | Yalnızca dahili IR blaster kullanılır |
-| Maksimum döngü aralığı 120 dk | UI kısıtı — Kotlin tarafı herhangi bir değeri kabul eder | Kod düzenlenerek arttırılabilir |
-| iOS desteklenmiyor | iOS'ta `ConsumerIrManager` eşdeğeri yok | — |
+- **Hardware:** Android device equipped with an Infrared (IR) Blaster (e.g., Xiaomi Redmi/POCO series, Huawei P/Mate series).
+- **Software:** Android 7.0+ (API 24+). Android 12+ requires "Exact Alarm" permission.
 
 ---
 
-## Katkıda Bulunma
+## Installation & Build
 
-1. Fork'layın
-2. Feature branch oluşturun: `git checkout -b feature/yeni-ozellik`
-3. Değişikliklerinizi commit edin: `git commit -m 'feat: yeni özellik ekle'`
-4. Push edin: `git push origin feature/yeni-ozellik`
-5. Pull Request açın
-
-### Klima IR Kodu Katkısı
-
-Kendi klimanızın doğru çalışan kapatma kodunu bulduyasanız lütfen `android/app/src/main/kotlin/.../MainActivity.kt` dosyasındaki `_defaultPresets` listesine ekleme önerisiyle PR açın.
+```bash
+git clone https://github.com/erkinavcii/IR-AC-Timer.git
+cd IR-AC-Timer
+flutter pub get
+flutter build apk --debug   # Output: build/app/outputs/flutter-apk/app-debug.apk
+```
 
 ---
 
-## Lisans
+## Scheduling Modes
 
-MIT License — Ayrıntılar için [LICENSE](LICENSE) dosyasına bakın.
+### 1. Countdown Mode (`countdown`)
+Transmits a single IR off-signal after a specified duration. Set via quick-select chips (15m, 30m, 1h...) or custom hour/minute wheel pickers.
+
+### 2. Scheduled Mode (`recurring`)
+Transmits an IR signal at the exact same clock time every day. Reschedules itself automatically until cancelled.
+
+### 3. Cycle Mode (`cycle`)
+Transmits repeating IR signals at regular intervals (e.g., every 30 minutes).
+- **Start Time (Optional):** If disabled, starts immediately. If enabled, schedules the first trigger at the specified time.
+- **End Time (Optional):** If disabled, runs indefinitely (and shows an ongoing status bar notification). If enabled, stops automatically at the set cutoff time.
 
 ---
 
-*Bu proje ESP32 veya herhangi bir harici donanım gerektirmez. Yalnızca dahili IR vericisi olan Android cihazlarda çalışır.*
+## AC Profiles (IR Codes)
+
+The app communicates using raw IR microsecond (`μs`) timing patterns over a 38 kHz carrier frequency.
+* **Built-in Presets:** LG / Beko / Arçelik, Samsung, Daikin, Dummy/Test.
+* **Adding Custom Profiles:** Find your AC's raw timing sequence from databases like [IRDB](https://github.com/probonopd/irdb), format as comma-separated integers (e.g., `9000, 4500, 560, 560...`), and save under **AC Profiles → Add New Profile**.
+
+---
+
+## Permission Management
+
+1. **Exact Alarm (`SCHEDULE_EXACT_ALARM`):** Required on Android 12+ to ensure timers fire without OS-imposed delays.
+2. **Ignore Battery Optimizations:** Prevents aggressive background task killers from silencing alarms during deep sleep.
+3. **Post Notifications (`POST_NOTIFICATIONS`):** Required on Android 13+ to display the ongoing warning notification during indefinite cycles.
+
+---
+
+## Xiaomi / MIUI / HyperOS Warning
+
+To prevent MIUI / HyperOS from killing background timers on Xiaomi, Redmi, or POCO devices:
+1. **Autostart:** Enable IR AC Timer in system Autostart settings.
+2. **Battery Saver:** Set to "No restrictions".
+> Tap the **"Open Autostart Settings"** button inside the app to jump directly to the relevant MIUI settings page.
+
+---
+
+## Architectural Decisions
+
+* **Flutter + Native Kotlin:** Flutter delivers a premium, responsive glassmorphic UI, while native Kotlin BroadcastReceivers handle hardware IR transmission and AlarmManager scheduling for rock-solid background execution.
+* **Why AlarmManager over WorkManager?** WorkManager imposes a mandatory 15-minute minimum interval and allows execution drift during Doze Mode. `AlarmManager.setExactAndAllowWhileIdle()` is strictly required for exact second-level precision.
+
+---
+
+## License
+
+MIT License — See [LICENSE](LICENSE) for details.
