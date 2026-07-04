@@ -47,10 +47,9 @@ Telefon derin uyku (Doze Mode) moduna geçse bile, Android'in `AlarmManager.setE
 
 ## Ekran Görüntüleri
 
-| Geri Sayım Kurulumu | Döngü Modu & Saatler | Aktif Görev (Glow Ring) | Klima Profilleri |
-|:---:|:---:|:---:|:---:|
-| *(Ekran görüntüsü eklenecek)* | *(Ekran görüntüsü eklenecek)* | *(Ekran görüntüsü eklenecek)* | *(Ekran görüntüsü eklenecek)* |
-| `docs/ss_countdown.png` | `docs/ss_cycle.png` | `docs/ss_active.png` | `docs/ss_profiles.png` |
+| Geri Sayım Kurulumu | Döngü Modu & Saatler | Aktif Görev (Glow Ring) | Klima Profilleri | Sonsuz Döngü Bildirimi |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/ss_countdown.png" width="180"/> | <img src="docs/ss_cycle.png" width="180"/> | <img src="docs/ss_active.png" width="180"/> | <img src="docs/ss_profiles.png" width="180"/> | <img src="docs/ss_notification.png" width="180"/> |
 
 ---
 
@@ -206,10 +205,9 @@ Even if your phone enters deep Doze Mode, Android's native `AlarmManager.setExac
 
 ## Screenshots
 
-| Countdown Setup | Cycle Mode & Times | Active Task (Glow Ring) | AC Profiles |
-|:---:|:---:|:---:|:---:|
-| *(Screenshot to be added)* | *(Screenshot to be added)* | *(Screenshot to be added)* | *(Screenshot to be added)* |
-| `docs/ss_countdown.png` | `docs/ss_cycle.png` | `docs/ss_active.png` | `docs/ss_profiles.png` |
+| Countdown Setup | Cycle Mode & Times | Active Task (Glow Ring) | AC Profiles | Persistent Notification |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/ss_countdown.png" width="180"/> | <img src="docs/ss_cycle.png" width="180"/> | <img src="docs/ss_active.png" width="180"/> | <img src="docs/ss_profiles.png" width="180"/> | <img src="docs/ss_notification.png" width="180"/> |
 
 ---
 
