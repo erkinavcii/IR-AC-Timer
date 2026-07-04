@@ -21,6 +21,15 @@ class MainActivity : FlutterActivity() {
     private val REQUEST_CODE = 1001
     private val TAG = "MainActivity"
 
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1002)
+            }
+        }
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
@@ -111,6 +120,9 @@ class MainActivity : FlutterActivity() {
         val am = getSystemService(Context.ALARM_SERVICE) as? AlarmManager
         map["exactAlarmGranted"] = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && am != null)
             am.canScheduleExactAlarms() else true
+
+        map["postNotificationsGranted"] = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED else true
 
         return map
     }
