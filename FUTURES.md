@@ -39,6 +39,22 @@ Bu doküman, **IR AC Timer** projesi için planlanan gelecekteki olası gelişti
 ### 5. 📊 Sıcaklık & Güç Tüketimi Tahminlemesi
 * Klimanın açık kaldığı süreleri loglayarak haftalık/aylık çalışma istatistikleri ve tahmini enerji tasarrufu grafikleri sunmak.
 
+### 6. ⚡ Dinamik Taşıyıcı Frekansı (Dynamic Carrier Frequency)
+* **Mevcut Durum:** Kotlin katmanında (`MainActivity.kt` ve `AlarmReceiver.kt`) kızılötesi vericiye gönderilen taşıyıcı frekansı şu an sabit olarak **38kHz (`38000`)** kodlanmıştır.
+* **Geliştirme Fikri:** Klimaların büyük çoğunluğu 38kHz kullansa da, bazı özel veya eski modeller (Örn: Daikin, Mitsubishi, Japon pazarı modelleri) **36kHz, 40kHz veya 56kHz** taşıyıcı frekansı kullanabilir. `DeviceProfile` modeline dinamik `frequency` alanı eklenerek Kotlin katmanına sinyal gönderirken profilin kendi frekansı iletilecektir.
+
+### 7. 🧹 Kod Tabanı Temizliği & Profesyonel Paket Adı (`applicationId`)
+* **Mevcut Durum:** Android `build.gradle.kts` dosyasında paket adı `com.example.ir_ac_timer.ir_ac_timer` olarak durmaktadır.
+* **Geliştirme Fikri:** Uygulamayı Google Play Store ve canlı yayın standartlarına uygun profesyonel bir paket adına (Örn: `com.erkinavci.iractimer`) taşımak; ayrıca projedeki kullanılmayan şablon (boilerplate) kodları ve importları temizlemek.
+
+### 8. 🔌 ESP32 USB-OTG / BLE Donanım Köprüsü & Otonom Görev Yükleyici (Standalone AC Timer Dongle)
+* **Fikir ve Çalışma Mantığı:** Kızılötesi (IR) vericisi olmayan telefonlar için veya klimanın yakınında telefon bırakmak istemeyen kullanıcılar için maliyeti 3-5$ olan bir **ESP32 IR Bridge / Sniffer** modülü entegre etmek.
+* **USB-OTG ile Telefonu Yükleyici (Flasher / Programmer) Yapma:**
+  - Kullanıcı uygulamanın arayüzünden tüm zamanlama senaryolarını (Örn: *"Her gece saat 02:00'de klimayı kapat"*, *"Her 5 saatte bir çalıştır ve durdur"*) ve klimasının IR profilini ayarlar.
+  - Ardından **ESP32 modülünü USB Type-C (OTG) kablosu ile doğrudan telefonuna bağlar!**
+  - Uygulama, USB-Serial / OTG bağlantısı üzerinden (`usb_serial` veya `esptool` benzeri bir protokolle) hazırlanan görev paketi ve IR kodlarını saniyeler içinde ESP32'nin kalıcı hafızasına (NVS / EEPROM / SPIFFS) **push eder (yükler)**.
+  - **Otonom Çalışma:** Kullanıcı ESP32'yi telefondan çıkarıp yatak odasında klimaya bakan herhangi bir USB şarj adaptörüne taktığı an, ESP32 kendi içindeki gerçek zaman saatini (RTC) veya uyku zamanlayıcısını işleterek **telefona veya Wi-Fi ağlarına hiç ihtiyaç duymadan** klimayı tam zamanında otomatik olarak yönetir!
+
 ---
 ---
 
@@ -76,3 +92,20 @@ Bu doküman, **IR AC Timer** projesi için planlanan gelecekteki olası gelişti
 
 ### 5. 📊 Usage Statistics & Energy Saving Insights
 * Tracking active timer durations to provide weekly/monthly charts of AC runtime and estimated electricity savings.
+
+### 6. ⚡ Dynamic Carrier Frequency
+* **Current State:** In the Kotlin layer (`MainActivity.kt` and `AlarmReceiver.kt`), the IR transmitter carrier frequency is hardcoded to **38kHz (`38000`)**.
+* **Feature Concept:** While 90% of air conditioners operate at 38kHz, certain special or legacy models (e.g., Daikin, Mitsubishi, Japanese domestic models) may require **36kHz, 40kHz, or 56kHz**. We will add a dynamic `frequency` property to `DeviceProfile` and pass it to the native Android IR layer when transmitting.
+
+### 7. 🧹 Codebase Cleanup & Production Package Name (`applicationId`)
+* **Current State:** The Android `build.gradle.kts` file currently uses the boilerplate package name `com.example.ir_ac_timer.ir_ac_timer`.
+* **Feature Concept:** Migrate the application to a production-grade package name (e.g., `com.erkinavci.iractimer`) suitable for Play Store publishing, and clean up unused boilerplate code and imports across Kotlin and Dart layers.
+
+### 8. 🔌 ESP32 USB-OTG / BLE Hardware Bridge & Standalone Task Flasher (Autonomous Dongle)
+* **Concept & Architecture:** For phones without built-in IR blasters or users who prefer not to leave their phones in the bedroom, integrate support for a low-cost ($3–$5) **ESP32 IR Bridge / Sniffer** hardware module.
+* **Phone as a USB-OTG Firmware / Schedule Flasher:**
+  - The user configures all scheduling routines (e.g., *"Turn off AC every night at 2:00 AM"*, *"Cycle AC every 5 hours"*) and IR profiles directly inside the Flutter app interface.
+  - Next, the user connects the **ESP32 module directly to their phone via a USB Type-C (OTG) cable!**
+  - The app communicates over USB-Serial / OTG (`usb_serial` or `esptool`-compatible protocol) to **push / flash** the entire schedule payload and IR arrays directly into the ESP32's non-volatile memory (NVS / EEPROM / SPIFFS) within seconds.
+  - **Autonomous Operation:** Once unplugged from the phone, the user plugs the ESP32 into any standard 5V USB wall adapter facing their AC. Using its internal Real-Time Clock (RTC) or deep-sleep timers, the ESP32 autonomously executes all AC routines **without requiring a phone, Bluetooth, or Wi-Fi connection!**
+
