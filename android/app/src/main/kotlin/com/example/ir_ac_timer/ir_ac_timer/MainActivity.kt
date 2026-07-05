@@ -18,7 +18,6 @@ import java.util.Calendar
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.ir_ac_timer/ir"
-    private val REQUEST_CODE = 1001
     private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: android.os.Bundle?) {
@@ -276,18 +275,8 @@ class MainActivity : FlutterActivity() {
         getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
             .edit().putString("active_task", taskJson.toString()).apply()
 
-        // Set alarm
-        val alarmIntent = Intent(this, AlarmReceiver::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        else PendingIntent.FLAG_UPDATE_CURRENT
-        val pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, alarmIntent, flags)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, firstTriggerTime, pendingIntent)
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, firstTriggerTime, pendingIntent)
-        }
+        // Set alarm via centralized scheduler
+        AlarmScheduler.scheduleExactAlarm(this, firstTriggerTime)
 
         // Show persistent notification for indefinite cycles
         if (mode == "cycle" && cycleEndEpoch == 0L) {
@@ -300,15 +289,7 @@ class MainActivity : FlutterActivity() {
 
     // ── Cancel task ───────────────────────────────────────────
     private fun cancelTask() {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
-        val alarmIntent = Intent(this, AlarmReceiver::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        else PendingIntent.FLAG_UPDATE_CURRENT
-        val pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, alarmIntent, flags)
-
-        alarmManager.cancel(pendingIntent)
-        pendingIntent.cancel()
+        AlarmScheduler.cancelAlarm(this)
 
         getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
             .edit().remove("active_task").apply()

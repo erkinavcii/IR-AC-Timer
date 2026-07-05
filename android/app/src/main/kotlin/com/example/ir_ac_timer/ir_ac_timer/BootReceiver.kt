@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import org.json.JSONObject
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.os.Build
 import java.util.Calendar
 
@@ -78,6 +76,9 @@ class BootReceiver : BroadcastReceiver() {
                     taskJson.put("nextTriggerEpochMillis", adjustedNext)
                     sharedPrefs.edit().putString("active_task", taskJson.toString()).apply()
                     scheduleAlarm(context, adjustedNext)
+                    if (endEpochMillis == 0L) {
+                        NotificationHelper.showCycleNotification(context, intervalMinutes, adjustedNext)
+                    }
                     Log.d(TAG, "Restored cycle alarm on boot. Next: $adjustedNext")
                 }
             }
@@ -87,18 +88,6 @@ class BootReceiver : BroadcastReceiver() {
     }
 
     private fun scheduleAlarm(context: Context, triggerTime: Long) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(context, AlarmReceiver::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val pendingIntent = PendingIntent.getBroadcast(context, 1001, alarmIntent, flags)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-        }
+        AlarmScheduler.scheduleExactAlarm(context, triggerTime)
     }
 }
