@@ -1,65 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'l10n/app_strings.dart';
 import 'splash_screen.dart';
+import 'theme/app_colors.dart';
+import 'models/device_profile.dart';
+import 'widgets/glow_ring_painter.dart';
+import 'widgets/find_my_ac_wizard.dart';
 
-// ─────────────────────────────────────────────────────────────
-// Theme Constants
-// ─────────────────────────────────────────────────────────────
-class AppColors {
-  static const Color bg = Color(0xFF05050A);
-  static const Color card = Color(0xFF0D0D14);
-  static const Color cardBorder = Color(0xFF1A1A2E);
-  static const Color surface = Color(0xFF12121C);
-  static const Color accent = Color(0xFF00D4FF);
-  static const Color accentDim = Color(0xFF0A3D4F);
-  static const Color success = Color(0xFF00E676);
-  static const Color warning = Color(0xFFFFB300);
-  static const Color danger = Color(0xFFFF5252);
-  static const Color textPrimary = Color(0xFFF0F0F5);
-  static const Color textSecondary = Color(0xFF8888AA);
-  static const Color textDim = Color(0xFF555570);
-
-  static const LinearGradient accentGradient = LinearGradient(
-    colors: [Color(0xFF00D4FF), Color(0xFF7B61FF)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient dangerGradient = LinearGradient(
-    colors: [Color(0xFFFF5252), Color(0xFFFF1744)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient cardGradient = LinearGradient(
-    colors: [Color(0xFF0D0D14), Color(0xFF10101A)],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// Device Profile Model
-// ─────────────────────────────────────────────────────────────
-class DeviceProfile {
-  String name;
-  List<int> pattern;
-
-  DeviceProfile({required this.name, required this.pattern});
-
-  Map<String, dynamic> toJson() => {'name': name, 'pattern': pattern};
-
-  factory DeviceProfile.fromJson(Map<String, dynamic> json) {
-    return DeviceProfile(
-      name: json['name'],
-      pattern: List<int>.from(json['pattern']),
-    );
-  }
-}
+export 'theme/app_colors.dart';
+export 'models/device_profile.dart';
 
 // ─────────────────────────────────────────────────────────────
 // Entry Point
@@ -130,84 +81,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Animated Glow Ring Widget
-// ─────────────────────────────────────────────────────────────
-class GlowRingPainter extends CustomPainter {
-  final double progress;
-  final Color color;
-  final double glowIntensity;
-
-  GlowRingPainter({required this.progress, required this.color, this.glowIntensity = 0.4});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2 - 16;
-    const strokeWidth = 6.0;
-
-    // Background ring
-    final bgPaint = Paint()
-      ..color = AppColors.cardBorder
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius, bgPaint);
-
-    if (progress <= 0) return;
-
-    // Glow
-    final glowPaint = Paint()
-      ..color = color.withOpacity(glowIntensity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth + 8
-      ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
-
-    final sweepAngle = 2 * math.pi * progress;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweepAngle,
-      false,
-      glowPaint,
-    );
-
-    // Progress ring
-    final ringPaint = Paint()
-      ..shader = SweepGradient(
-        startAngle: -math.pi / 2,
-        endAngle: -math.pi / 2 + sweepAngle,
-        colors: [color, color.withOpacity(0.6), color],
-        stops: const [0.0, 0.5, 1.0],
-        transform: const GradientRotation(-math.pi / 2),
-      ).createShader(Rect.fromCircle(center: center, radius: radius))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweepAngle,
-      false,
-      ringPaint,
-    );
-
-    // Endpoint dot
-    final dotAngle = -math.pi / 2 + sweepAngle;
-    final dotPos = Offset(
-      center.dx + radius * math.cos(dotAngle),
-      center.dy + radius * math.sin(dotAngle),
-    );
-    final dotPaint = Paint()..color = Colors.white;
-    canvas.drawCircle(dotPos, 4, dotPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant GlowRingPainter old) =>
-      old.progress != progress || old.color != color;
-}
+// (GlowRingPainter moved to lib/widgets/glow_ring_painter.dart)
 
 // ─────────────────────────────────────────────────────────────
 // Main Screen
@@ -260,12 +134,7 @@ class _MainScreenState extends State<MainScreen>
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  static final List<DeviceProfile> _defaultPresets = [
-    DeviceProfile(name: 'LG / Beko / Arçelik', pattern: [9000,4500,560,560,560,1680,560,560,560,560,560,1680,560,560,560,560,560,1680,560,1680,560,1680,560,560,560,1680,560,1680,560,560,560,560,560,560,560,560,560,1680,560,560,560,560,560,560,560,560,560,560,560,560,560,1680,560,560,560,1680,560,1680,560,1680,560,1680,560,1680,560,1680,560,1680,560,40000]),
-    DeviceProfile(name: 'Samsung', pattern: [3000,3000,500,1500,500,500,500,1500,500,500,500,1500,500,500,500,1500,500,500,500,1500,500,1500,500,500,500,1500,500,1500,500,500,500,500,500,500,500,1500,500,1500,500,500,500,1500,500,500,500,500,500,500,500,1500,500,1500,500,1500,500,1500,500,1500,500,1500,500]),
-    DeviceProfile(name: 'Daikin', pattern: [3400,1700,450,450,450,1300,450,450,450,450,450,1300,450,450,450,450,450,1300,450,1300,450,1300,450,450,450,1300,450,1300,450,450,450,450,450,450,450,450,450,1300,450,450,450,450,450,450,450,450,450,450,450,450,450,1300,450,450,450,1300,450,1300,450,1300,450,1300,450,1300,450,1300,450,10000]),
-    DeviceProfile(name: 'Dummy / Test', pattern: [9000,4500,560,560,560,1680,560,560,560,560]),
-  ];
+  // (_defaultPresets moved to DeviceProfile.defaultPresets)
 
   @override
   void initState() {
@@ -313,7 +182,7 @@ class _MainScreenState extends State<MainScreen>
         loaded = decoded.map((e) => DeviceProfile.fromJson(e)).toList();
       }
       if (loaded.isEmpty) {
-        loaded = List.from(_defaultPresets);
+        loaded = List.from(DeviceProfile.defaultPresets);
         await _saveProfilesToStore(loaded);
       }
       DeviceProfile selected = loaded.firstWhere(
@@ -677,6 +546,12 @@ class _MainScreenState extends State<MainScreen>
               const SizedBox(height: 24),
               _buildProfilesSection(),
               const SizedBox(height: 16),
+              if (_activeTask == null)
+                FindMyAcCard(
+                  onTestSignal: _testWizardSignal,
+                  onSaveResult: _saveWizardResult,
+                ),
+              if (_activeTask == null) const SizedBox(height: 16),
               if (_activeTask == null) _buildXiaomiCard(),
               const SizedBox(height: 24),
             ],
@@ -1232,6 +1107,41 @@ class _MainScreenState extends State<MainScreen>
         child: Icon(icon, size: 18, color: color),
       ),
     );
+  }
+
+  // (Wizard methods moved to FindMyAcCard widget in lib/widgets/find_my_ac_wizard.dart)
+
+  Future<void> _testWizardSignal(String patternStr) async {
+    try {
+      final List<int> pattern = patternStr.split(',').map((e) => int.parse(e.trim())).toList();
+      if (pattern.isEmpty) return;
+      final bool ok = await _channel.invokeMethod('transmitIr', {'pattern': pattern});
+      _snack(ok ? AppStrings.get('testSent') : AppStrings.get('testFailed'), ok ? AppColors.success : AppColors.danger);
+    } catch (e) {
+      _snack('Error: $e', AppColors.danger);
+    }
+  }
+
+  void _saveWizardResult(String name, String patternStr) async {
+    final List<int> pattern = patternStr.split(',').map((e) => int.parse(e.trim())).toList();
+    if (pattern.isEmpty) return;
+    
+    int existingIndex = _profiles.indexWhere((p) => p.name.toLowerCase() == name.toLowerCase());
+    List<DeviceProfile> updated;
+    DeviceProfile targetProfile;
+    if (existingIndex != -1) {
+      targetProfile = DeviceProfile(name: name, pattern: pattern);
+      updated = List<DeviceProfile>.from(_profiles);
+      updated[existingIndex] = targetProfile;
+    } else {
+      targetProfile = DeviceProfile(name: name, pattern: pattern);
+      updated = List<DeviceProfile>.from(_profiles)..add(targetProfile);
+    }
+    
+    await _saveProfilesToStore(updated);
+    setState(() => _profiles = updated);
+    await _updateSelectedProfile(targetProfile);
+    _snack('${AppStrings.get("wizardSaved")} $name', AppColors.success);
   }
 
   // ── Xiaomi Card ───────────────────────────────────────────

@@ -98,6 +98,19 @@ class AppStrings {
     'xiaomiDesc':     {'tr': 'Agresif güç yöneticisi arka plan görevlerini sonlandırabilir. Otomatik Başlatma listesine eklemeyi unutmayın.', 'en': 'Aggressive power management may kill background tasks. Add this app to Autostart list.'},
     'openAutostart':  {'tr': 'Otomatik Başlatma Ayarları',            'en': 'Open Autostart Settings'},
 
+    // ── Find My AC Wizard ──────────────────────────────────
+    'findMyAcTitle':  {'tr': '🪄 Klimamın Sinyalini Bul (Sihirbaz)',  'en': '🪄 Find My AC Signal (Wizard)'},
+    'findMyAcSub':    {'tr': 'LG / Beko / Arçelik 14 kumanda setini tek tek deneyin.', 'en': 'Test 14 code sets for LG / Beko / Arçelik one by one.'},
+    'startWizardBtn': {'tr': 'SİNYAL SİHİRBAZINI BAŞLAT',               'en': 'START SIGNAL WIZARD'},
+    'wizardInstruct': {'tr': 'Telefonunuzu klimaya doğrultun ve "Sinyali Gönder" butonuna basın. Klima tepki verene kadar hayır deyip sıradaki sete geçin.', 'en': 'Point phone at AC and tap "Transmit Signal". If no response, tap No to try next set.'},
+    'wizardSetLabel': {'tr': 'Deneme Seti:',                          'en': 'Testing Set:'},
+    'wizardSend':     {'tr': '📡 SİNYALİ GÖNDER (TEST ET)',             'en': '📡 TRANSMIT SIGNAL (TEST)'},
+    'wizardQuestion': {'tr': 'Klimanız bip sesi verip tepki verdi mi?', 'en': 'Did your AC beep and respond?'},
+    'wizardNo':       {'tr': 'Hayır (Sonraki ➔)',                     'en': 'No (Next ➔)'},
+    'wizardYes':      {'tr': 'Evet, Çalıştı! (Kaydet)',               'en': 'Yes, It Worked! (Save)'},
+    'wizardSaved':    {'tr': 'Harika! Sinyal profilinize kaydedildi:', 'en': 'Awesome! Signal saved to your profiles:'},
+    'wizardLoop':     {'tr': '14 set tamamlandı, baştan başlanıyor.',  'en': '14 sets completed, looping from start.'},
+
     // ── Feedback / snackbars ───────────────────────────────
     'timerSetOk':     {'tr': 'Zamanlayıcı başarıyla kuruldu!',        'en': 'Timer scheduled successfully!'},
     'alarmSetOk':     {'tr': 'Günlük alarm kuruldu!',                 'en': 'Daily alarm scheduled!'},
