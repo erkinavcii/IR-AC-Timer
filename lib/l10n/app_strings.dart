@@ -110,6 +110,12 @@ class AppStrings {
     'wizardYes':      {'tr': 'Evet, Çalıştı! (Kaydet)',               'en': 'Yes, It Worked! (Save)'},
     'wizardSaved':    {'tr': 'Harika! Sinyal profilinize kaydedildi:', 'en': 'Awesome! Signal saved to your profiles:'},
     'wizardLoop':     {'tr': '14 set tamamlandı, baştan başlanıyor.',  'en': '14 sets completed, looping from start.'},
+    'smartOffTitle':  {'tr': '🛡️ Akıllı Kapatma Eşleştirmesi',           'en': '🛡️ Smart Off-Mapping'},
+    'smartOffBody':   {'tr': 'Klimanızın protokol ailesi algılandı.\n\nDoğruladığınız sinyal bir mod/derece sinyali olduğu için, gece zamanlayıcı devreye girdiğinde klimanızın kapanmayıp açık kalmasını önlemek amacıyla bu ailenin %100 doğrulanmış "Güç Kapatma (Power OFF)" kodu ana profilinize tanımlandı.', 'en': 'Your AC protocol family was detected.\n\nSince the signal you verified is a mode/temp signal, our verified Power OFF code for this family has been mapped to your profile to ensure your AC turns off reliably when the timer fires.'},
+    'smartOffBtn':    {'tr': 'Anladım, Harika!',                       'en': 'Got it, Great!'},
+    'missingOffTitle': {'tr': '⚠️ Kapatma Sinyali Gerekli',               'en': '⚠️ Power OFF Signal Required'},
+    'missingOffBody':  {'tr': 'Klimanızın marka ailesi tespit edildi, ancak doğruladığınız bu sinyal bir mod/derece veya doğrulanmamış açma/kapama sinyalidir.\n\nElimizde bu marka için henüz doğrulanmış kesin bir "Kapatma (Power OFF)" kodu bulunmuyor. Gece zamanlayıcının klimanızı güvenle kapatabilmesi için Ham IR Kodu Düzenleme ekranından veya ESP32 Sniffer üzerinden kendi kumandanızın kesin Kapatma kodunu eklemenizi öneririz.', 'en': 'Your AC brand family was detected, but the verified signal is a mode/temp or unverified toggle signal.\n\nWe do not currently have a verified Power OFF code for this brand. To ensure reliable power-off, please add your own OFF code via Raw IR Editor or ESP32 Sniffer.'},
+    'missingOffBtn':   {'tr': 'Anladım',                                'en': 'Understood'},
 
     // ── Feedback / snackbars ───────────────────────────────
     'timerSetOk':     {'tr': 'Zamanlayıcı başarıyla kuruldu!',        'en': 'Timer scheduled successfully!'},

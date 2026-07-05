@@ -5,7 +5,7 @@ import '../data/ac_signals.dart';
 
 class FindMyAcCard extends StatelessWidget {
   final Future<void> Function(String patternStr) onTestSignal;
-  final void Function(String name, String patternStr) onSaveResult;
+  final void Function(Map<String, String> selectedSet) onSaveResult;
 
   const FindMyAcCard({
     super.key,
@@ -243,7 +243,7 @@ class FindMyAcCard extends StatelessWidget {
                             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                           ),
                           onPressed: () {
-                            onSaveResult(name, pattern);
+                            onSaveResult(set);
                             Navigator.pop(ctx);
                           },
                         ),

@@ -1122,26 +1122,87 @@ class _MainScreenState extends State<MainScreen>
     }
   }
 
-  void _saveWizardResult(String name, String patternStr) async {
-    final List<int> pattern = patternStr.split(',').map((e) => int.parse(e.trim())).toList();
+  void _saveWizardResult(Map<String, String> set) async {
+    final String rawName = set['name'] ?? 'Wizard Profile';
+    final String patternStr = set['pattern'] ?? '';
+    final String family = set['family'] ?? 'Unknown';
+    final String signalType = set['signalType'] ?? 'mode';
+    final String offPatternStr = set['offPattern'] ?? '';
+
+    String targetName = rawName;
+    String targetPatternStr = patternStr;
+    bool isMappedToOff = false;
+    bool isMissingOff = false;
+
+    if (signalType != 'off') {
+      if (offPatternStr.isNotEmpty) {
+        targetName = '$family (Zamanlayıcı Kapatma Profili)';
+        targetPatternStr = offPatternStr;
+        isMappedToOff = true;
+      } else {
+        isMissingOff = true;
+      }
+    }
+
+    if (isMissingOff) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.card,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(AppStrings.get('missingOffTitle'), style: const TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold)),
+          content: Text(AppStrings.get('missingOffBody'), style: const TextStyle(color: AppColors.textPrimary, height: 1.4)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(AppStrings.get('missingOffBtn'), style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final List<int> pattern = targetPatternStr.split(',').map((e) => int.parse(e.trim())).toList();
     if (pattern.isEmpty) return;
-    
-    int existingIndex = _profiles.indexWhere((p) => p.name.toLowerCase() == name.toLowerCase());
+
+    int existingIndex = _profiles.indexWhere((p) => p.name.toLowerCase() == targetName.toLowerCase());
     List<DeviceProfile> updated;
     DeviceProfile targetProfile;
     if (existingIndex != -1) {
-      targetProfile = DeviceProfile(name: name, pattern: pattern);
+      targetProfile = DeviceProfile(name: targetName, pattern: pattern);
       updated = List<DeviceProfile>.from(_profiles);
       updated[existingIndex] = targetProfile;
     } else {
-      targetProfile = DeviceProfile(name: name, pattern: pattern);
+      targetProfile = DeviceProfile(name: targetName, pattern: pattern);
       updated = List<DeviceProfile>.from(_profiles)..add(targetProfile);
     }
-    
+
     await _saveProfilesToStore(updated);
     setState(() => _profiles = updated);
     await _updateSelectedProfile(targetProfile);
-    _snack('${AppStrings.get("wizardSaved")} $name', AppColors.success);
+
+    if (isMappedToOff) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.card,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(AppStrings.get('smartOffTitle'), style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
+          content: Text(AppStrings.get('smartOffBody'), style: const TextStyle(color: AppColors.textPrimary, height: 1.4)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(AppStrings.get('smartOffBtn'), style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      _snack('${AppStrings.get("wizardSaved")} $targetName', AppColors.success);
+    }
   }
 
   // ── Xiaomi Card ───────────────────────────────────────────
