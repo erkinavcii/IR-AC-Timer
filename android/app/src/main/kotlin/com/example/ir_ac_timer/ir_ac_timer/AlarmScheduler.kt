@@ -9,12 +9,26 @@ import android.util.Log
 
 /**
  * Single Source of Truth for scheduling and canceling background IR alarms.
- * Centralizes AlarmManager flags, PendingIntent creation, and REQUEST_CODE = 1001
- * to prevent synchronization bugs across MainActivity, AlarmReceiver, and BootReceiver.
+ * Centralizes AlarmManager flags, PendingIntent creation, and the request
+ * code to prevent synchronization bugs across MainActivity, AlarmReceiver,
+ * and BootReceiver.
  */
 object AlarmScheduler {
     private const val TAG = "AlarmScheduler"
-    const val REQUEST_CODE = 1001
+    const val REQUEST_CODE = AppConstants.REQUEST_CODE_ALARM
+
+    /** Shared immutable-update flags for every PendingIntent in the app. */
+    fun pendingIntentFlags(): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+    private fun alarmPendingIntent(context: Context): PendingIntent =
+        PendingIntent.getBroadcast(
+            context, REQUEST_CODE, Intent(context, AlarmReceiver::class.java), pendingIntentFlags()
+        )
 
     fun scheduleExactAlarm(context: Context, triggerTimeMillis: Long) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
@@ -23,14 +37,7 @@ object AlarmScheduler {
             return
         }
 
-        val alarmIntent = Intent(context, AlarmReceiver::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, alarmIntent, flags)
-
+        val pendingIntent = alarmPendingIntent(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent)
         } else {
@@ -41,14 +48,7 @@ object AlarmScheduler {
 
     fun cancelAlarm(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
-        val alarmIntent = Intent(context, AlarmReceiver::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, alarmIntent, flags)
-
+        val pendingIntent = alarmPendingIntent(context)
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
         Log.d(TAG, "Canceled alarm with REQUEST_CODE=$REQUEST_CODE")

@@ -8,13 +8,11 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import org.json.JSONObject
-import java.util.Calendar
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.ir_ac_timer/ir"
@@ -73,7 +71,7 @@ class MainActivity : FlutterActivity() {
                     ))
                 }
                 "cancelTask" -> {
-                    cancelTask()
+                    TaskManager.cancel(this)
                     result.success(true)
                 }
                 "getTask" -> {
@@ -81,27 +79,25 @@ class MainActivity : FlutterActivity() {
                 }
                 "transmitIr" -> {
                     val patternList = call.argument<List<Int>>("pattern") ?: emptyList()
-                    result.success(transmitIrSignal(patternList.toIntArray()))
+                    result.success(IrTransmitter.transmit(this, patternList.toIntArray()))
                 }
                 "saveProfiles" -> {
                     val profilesJson = call.argument<String>("profiles") ?: ""
-                    getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
-                        .edit().putString("device_profiles", profilesJson).apply()
+                    AppConstants.prefs(this)
+                        .edit().putString(AppConstants.KEY_DEVICE_PROFILES, profilesJson).apply()
                     result.success(true)
                 }
                 "getProfiles" -> {
-                    val prefs = getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
-                    result.success(prefs.getString("device_profiles", null))
+                    result.success(AppConstants.prefs(this).getString(AppConstants.KEY_DEVICE_PROFILES, null))
                 }
                 "saveSelectedProfile" -> {
                     val name = call.argument<String>("name") ?: ""
-                    getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
-                        .edit().putString("selected_profile_name", name).apply()
+                    AppConstants.prefs(this)
+                        .edit().putString(AppConstants.KEY_SELECTED_PROFILE, name).apply()
                     result.success(true)
                 }
                 "getSelectedProfile" -> {
-                    val prefs = getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
-                    result.success(prefs.getString("selected_profile_name", null))
+                    result.success(AppConstants.prefs(this).getString(AppConstants.KEY_SELECTED_PROFILE, null))
                 }
                 else -> result.notImplemented()
             }
@@ -175,15 +171,6 @@ class MainActivity : FlutterActivity() {
         return false
     }
 
-    // ── IR transmit ───────────────────────────────────────────
-    private fun transmitIrSignal(pattern: IntArray): Boolean {
-        val irManager = getSystemService(Context.CONSUMER_IR_SERVICE) as? ConsumerIrManager
-        return if (irManager != null && irManager.hasIrEmitter()) {
-            try { irManager.transmit(38000, pattern); true }
-            catch (e: Exception) { Log.e(TAG, "IR transmit error: ${e.message}"); false }
-        } else false
-    }
-
     // ── Schedule task ─────────────────────────────────────────
     private fun scheduleTask(
         mode: String,
@@ -204,55 +191,24 @@ class MainActivity : FlutterActivity() {
             return false
         }
 
-        var firstTriggerTime: Long
+        val now = System.currentTimeMillis()
+        val firstTriggerTime: Long
         var targetEpoch: Long? = null
         var cycleEndEpoch = 0L
 
         when (mode) {
-            "countdown" -> {
-                firstTriggerTime = System.currentTimeMillis() + durationMinutes * 60 * 1000L
+            AppConstants.MODE_COUNTDOWN -> {
+                firstTriggerTime = now + durationMinutes * 60 * 1000L
                 targetEpoch = firstTriggerTime
             }
-            "recurring" -> {
-                val cal = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, targetHour)
-                    set(Calendar.MINUTE, targetMinute)
-                    set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-                }
-                if (cal.timeInMillis <= System.currentTimeMillis()) cal.add(Calendar.DAY_OF_YEAR, 1)
-                firstTriggerTime = cal.timeInMillis
+            AppConstants.MODE_RECURRING -> {
+                firstTriggerTime = ScheduleCalculator.nextDailyTrigger(now, targetHour, targetMinute)
             }
-            "cycle" -> {
-                // ── Start time ──────────────────────────────
-                firstTriggerTime = if (cycleStartHour >= 0 && cycleStartMinute >= 0) {
-                    // User specified a start time → first signal fires AT that time
-                    val startCal = Calendar.getInstance().apply {
-                        set(Calendar.HOUR_OF_DAY, cycleStartHour)
-                        set(Calendar.MINUTE, cycleStartMinute)
-                        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-                    }
-                    // If start time already passed today, push to tomorrow
-                    if (startCal.timeInMillis <= System.currentTimeMillis()) {
-                        startCal.add(Calendar.DAY_OF_YEAR, 1)
-                    }
-                    startCal.timeInMillis
-                } else {
-                    // No start time → first trigger is now + interval
-                    System.currentTimeMillis() + cycleIntervalMin * 60 * 1000L
-                }
-
-                // ── End time ────────────────────────────────
-                if (cycleEndHour >= 0 && cycleEndMinute >= 0) {
-                    val endCal = Calendar.getInstance().apply {
-                        set(Calendar.HOUR_OF_DAY, cycleEndHour)
-                        set(Calendar.MINUTE, cycleEndMinute)
-                        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-                    }
-                    if (endCal.timeInMillis <= System.currentTimeMillis()) {
-                        endCal.add(Calendar.DAY_OF_YEAR, 1)
-                    }
-                    cycleEndEpoch = endCal.timeInMillis
-                }
+            AppConstants.MODE_CYCLE -> {
+                firstTriggerTime = ScheduleCalculator.cycleFirstTrigger(
+                    now, cycleStartHour, cycleStartMinute, cycleIntervalMin
+                )
+                cycleEndEpoch = ScheduleCalculator.cycleEndEpoch(now, cycleEndHour, cycleEndMinute)
             }
             else -> return false
         }
@@ -266,20 +222,20 @@ class MainActivity : FlutterActivity() {
             put("durationMinutes", durationMinutes)
             put("pattern", patternString)
             put("oneTimeEpochMillis", targetEpoch ?: JSONObject.NULL)
-            put("scheduledTime", System.currentTimeMillis())
+            put("scheduledTime", now)
             put("cycleIntervalMinutes", cycleIntervalMin)
             put("cycleEndEpochMillis", cycleEndEpoch)
-            put("nextTriggerEpochMillis", if (mode == "cycle") firstTriggerTime else JSONObject.NULL)
+            put("nextTriggerEpochMillis", if (mode == AppConstants.MODE_CYCLE) firstTriggerTime else JSONObject.NULL)
         }
 
-        getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
-            .edit().putString("active_task", taskJson.toString()).apply()
+        AppConstants.prefs(this)
+            .edit().putString(AppConstants.KEY_ACTIVE_TASK, taskJson.toString()).apply()
 
         // Set alarm via centralized scheduler
         AlarmScheduler.scheduleExactAlarm(this, firstTriggerTime)
 
         // Show persistent notification for indefinite cycles
-        if (mode == "cycle" && cycleEndEpoch == 0L) {
+        if (mode == AppConstants.MODE_CYCLE && cycleEndEpoch == 0L) {
             NotificationHelper.showCycleNotification(this, cycleIntervalMin, firstTriggerTime)
         }
 
@@ -287,18 +243,6 @@ class MainActivity : FlutterActivity() {
         return true
     }
 
-    // ── Cancel task ───────────────────────────────────────────
-    private fun cancelTask() {
-        AlarmScheduler.cancelAlarm(this)
-
-        getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE)
-            .edit().remove("active_task").apply()
-
-        // Always attempt to dismiss any lingering notification
-        NotificationHelper.cancelNotification(this)
-        Log.d(TAG, "Task cancelled.")
-    }
-
     private fun getSavedTask(): String? =
-        getSharedPreferences("ir_ac_timer_prefs", Context.MODE_PRIVATE).getString("active_task", null)
+        AppConstants.prefs(this).getString(AppConstants.KEY_ACTIVE_TASK, null)
 }

@@ -43,12 +43,8 @@ object NotificationHelper {
         val openIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val openPendingIntent = PendingIntent.getActivity(context, 0, openIntent, flags)
+        val openPendingIntent =
+            PendingIntent.getActivity(context, 0, openIntent, AlarmScheduler.pendingIntentFlags())
 
         // Format next trigger time
         val nextTime = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
