@@ -4,6 +4,20 @@ Bu doküman, **IR AC Timer** projesi için planlanan gelecekteki olası gelişti
 
 ---
 
+## ✅ Bu Sürümde Uygulananlar (Implemented in this release)
+
+Aşağıdaki yol haritası maddeleri artık uygulamada mevcuttur:
+
+* **#4 (kısmi) — Ana Ekran Widget'ı:** Tek dokunuşla "AC KAPAT" ve statik "Sonraki: HH:mm" gösteren home-screen widget'ı eklendi. (Wear OS hâlâ gelecekte.)
+* **#5 — Kullanım İstatistikleri:** Toplam gönderim, son 7 gün, son gönderim ve tahmini kapalı kalma süresi gösteren açılır kart eklendi (sadece zamanlanmış tetiklemeler + widget sayılır).
+* **#6 — Profil Bazlı Taşıyıcı Frekans:** `DeviceProfile.frequency` alanı (varsayılan 38 kHz) eklendi; profil diyaloglarından düzenlenebilir ve native katmana iletiliyor. Eski profiller geriye uyumlu.
+* **#7 — Profesyonel Paket Adı & Temizlik:** `applicationId` → `com.erkinavci.iractimer`; LICENSE, release imzalama yapılandırması; `main.dart` monoliti servis/controller/widget katmanlarına bölündü.
+* **#10 (mobil kısım) — 3× Yedekli Sinyal:** Zamanlanmış tetiklemelerde IR sinyali 500 ms aralıklarla 3 kez gönderiliyor (`IrTransmitter.transmitBurst`).
+
+Ayrıca yol haritası dışı iyileştirmeler: kalıcı dil tercihi, bildirim yerelleştirmesi (TR/EN) ve bildirimde "Durdur" aksiyon butonu.
+
+---
+
 ## 🇹🇷 Türkçe Yol Haritası
 
 ### 1. 🌡️ Sıcaklık ve Mod Bazlı Akıllı Açma/Kapatma (Stateful Scheduling)
