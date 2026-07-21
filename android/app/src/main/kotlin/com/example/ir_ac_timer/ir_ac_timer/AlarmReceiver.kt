@@ -29,7 +29,8 @@ class AlarmReceiver : BroadcastReceiver() {
             if (patternString.isNotEmpty()) {
                 val pattern = patternString.split(",").map { it.trim().toInt() }.toIntArray()
                 val frequency = taskJson.optInt("frequency", AppConstants.DEFAULT_CARRIER_HZ)
-                IrTransmitter.transmit(context, pattern, frequency)
+                // 3× redundant burst on scheduled fires for reliability
+                IrTransmitter.transmitBurst(context, pattern, frequency)
             } else {
                 Log.e(TAG, "IR Pattern is empty!")
             }
