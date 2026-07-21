@@ -64,10 +64,12 @@ class MainActivity : FlutterActivity() {
                     val cycleStartMinute    = call.argument<Int>("cycleStartMinute") ?: -1
                     val cycleEndHour        = call.argument<Int>("cycleEndHour") ?: -1
                     val cycleEndMinute      = call.argument<Int>("cycleEndMinute") ?: -1
+                    val frequency           = call.argument<Int>("frequency") ?: AppConstants.DEFAULT_CARRIER_HZ
 
                     result.success(scheduleTask(
                         mode, targetHour, targetMinute, durationMinutes, patternList,
-                        cycleIntervalMin, cycleStartHour, cycleStartMinute, cycleEndHour, cycleEndMinute
+                        cycleIntervalMin, cycleStartHour, cycleStartMinute, cycleEndHour, cycleEndMinute,
+                        frequency
                     ))
                 }
                 "cancelTask" -> {
@@ -79,7 +81,8 @@ class MainActivity : FlutterActivity() {
                 }
                 "transmitIr" -> {
                     val patternList = call.argument<List<Int>>("pattern") ?: emptyList()
-                    result.success(IrTransmitter.transmit(this, patternList.toIntArray()))
+                    val frequency = call.argument<Int>("frequency") ?: AppConstants.DEFAULT_CARRIER_HZ
+                    result.success(IrTransmitter.transmit(this, patternList.toIntArray(), frequency))
                 }
                 "saveProfiles" -> {
                     val profilesJson = call.argument<String>("profiles") ?: ""
@@ -192,7 +195,8 @@ class MainActivity : FlutterActivity() {
         cycleStartHour: Int = -1,
         cycleStartMinute: Int = -1,
         cycleEndHour: Int = -1,
-        cycleEndMinute: Int = -1
+        cycleEndMinute: Int = -1,
+        frequency: Int = AppConstants.DEFAULT_CARRIER_HZ
     ): Boolean {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return false
 
@@ -231,6 +235,7 @@ class MainActivity : FlutterActivity() {
             put("targetMinute", targetMinute)
             put("durationMinutes", durationMinutes)
             put("pattern", patternString)
+            put("frequency", frequency)
             put("oneTimeEpochMillis", targetEpoch ?: JSONObject.NULL)
             put("scheduledTime", now)
             put("cycleIntervalMinutes", cycleIntervalMin)

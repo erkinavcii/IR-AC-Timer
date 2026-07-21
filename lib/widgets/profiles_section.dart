@@ -173,6 +173,7 @@ class _ProfilesSectionState extends State<ProfilesSection> {
   void _showAddProfileDialog() {
     final nc = TextEditingController();
     final cc = TextEditingController(text: '9000, 4500, 560, 560');
+    final fc = TextEditingController(text: '$kDefaultCarrierHz');
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -183,6 +184,8 @@ class _ProfilesSectionState extends State<ProfilesSection> {
           _dialogField(nc, AppStrings.get('profileName'), AppStrings.get('profileNameHint')),
           const SizedBox(height: 12),
           _dialogField(cc, AppStrings.get('signalPattern'), '9000, 4500, 560...', maxLines: 3),
+          const SizedBox(height: 12),
+          _dialogField(fc, AppStrings.get('frequency'), AppStrings.get('frequencyHint'), keyboardType: TextInputType.number),
         ])),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(AppStrings.get('cancel'), style: const TextStyle(color: AppColors.textSecondary))),
@@ -194,9 +197,14 @@ class _ProfilesSectionState extends State<ProfilesSection> {
                 widget.onSnack(AppStrings.get('invalidPattern'), AppColors.danger);
                 return;
               }
+              final freq = tryParseFrequency(fc.text);
+              if (freq == null) {
+                widget.onSnack(AppStrings.get('invalidFrequency'), AppColors.danger);
+                return;
+              }
               if (nc.text.trim().isEmpty) return;
               Navigator.pop(context);
-              final errorKey = await _profiles.add(nc.text.trim(), p);
+              final errorKey = await _profiles.add(nc.text.trim(), p, frequency: freq);
               if (errorKey != null) widget.onSnack(AppStrings.get(errorKey), AppColors.warning);
             },
             child: Text(AppStrings.get('add')),
@@ -211,6 +219,7 @@ class _ProfilesSectionState extends State<ProfilesSection> {
     if (selected == null) return;
     final nc = TextEditingController(text: selected.name);
     final cc = TextEditingController(text: formatIrPattern(selected.pattern));
+    final fc = TextEditingController(text: '${selected.frequency}');
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -221,6 +230,8 @@ class _ProfilesSectionState extends State<ProfilesSection> {
           _dialogField(nc, AppStrings.get('profileName'), ''),
           const SizedBox(height: 12),
           _dialogField(cc, AppStrings.get('signalPattern'), '', maxLines: 3),
+          const SizedBox(height: 12),
+          _dialogField(fc, AppStrings.get('frequency'), AppStrings.get('frequencyHint'), keyboardType: TextInputType.number),
         ])),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(AppStrings.get('cancel'), style: const TextStyle(color: AppColors.textSecondary))),
@@ -232,8 +243,13 @@ class _ProfilesSectionState extends State<ProfilesSection> {
                 widget.onSnack(AppStrings.get('invalidPattern'), AppColors.danger);
                 return;
               }
+              final freq = tryParseFrequency(fc.text);
+              if (freq == null) {
+                widget.onSnack(AppStrings.get('invalidFrequency'), AppColors.danger);
+                return;
+              }
               if (nc.text.trim().isEmpty) return;
-              _profiles.edit(selected, nc.text.trim(), p);
+              _profiles.edit(selected, nc.text.trim(), p, frequency: freq);
               Navigator.pop(context);
             },
             child: Text(AppStrings.get('save')),
@@ -243,10 +259,12 @@ class _ProfilesSectionState extends State<ProfilesSection> {
     );
   }
 
-  Widget _dialogField(TextEditingController c, String label, String hint, {int maxLines = 1}) {
+  Widget _dialogField(TextEditingController c, String label, String hint,
+      {int maxLines = 1, TextInputType? keyboardType}) {
     return TextField(
       controller: c,
       maxLines: maxLines,
+      keyboardType: keyboardType,
       style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontFamily: maxLines > 1 ? 'monospace' : 'Roboto'),
       decoration: InputDecoration(
         labelText: label,

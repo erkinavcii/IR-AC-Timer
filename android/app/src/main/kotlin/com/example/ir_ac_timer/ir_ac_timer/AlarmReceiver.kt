@@ -28,7 +28,8 @@ class AlarmReceiver : BroadcastReceiver() {
             // Transmit IR signal first — a reschedule failure must never skip the send
             if (patternString.isNotEmpty()) {
                 val pattern = patternString.split(",").map { it.trim().toInt() }.toIntArray()
-                IrTransmitter.transmit(context, pattern)
+                val frequency = taskJson.optInt("frequency", AppConstants.DEFAULT_CARRIER_HZ)
+                IrTransmitter.transmit(context, pattern, frequency)
             } else {
                 Log.e(TAG, "IR Pattern is empty!")
             }

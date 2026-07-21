@@ -30,3 +30,18 @@ List<int>? tryParseIrPattern(String input) {
 }
 
 String formatIrPattern(List<int> pattern) => pattern.join(', ');
+
+/// Reasonable bounds for an IR carrier frequency (Hz). Consumer IR is
+/// typically 36–40 kHz; this range is deliberately generous.
+const int kMinCarrierHz = 20000;
+const int kMaxCarrierHz = 60000;
+
+/// Parses a carrier frequency in Hz, or null when out of range / invalid.
+int? tryParseFrequency(String input) {
+  final value = int.tryParse(input.trim());
+  if (value == null || value < kMinCarrierHz || value > kMaxCarrierHz) {
+    return null;
+  }
+  return value;
+}
+

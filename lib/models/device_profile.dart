@@ -1,15 +1,27 @@
+/// Default IR carrier frequency (Hz). Most ACs use 38 kHz; a few brands
+/// use 36/40 kHz, which is why it is now per-profile.
+const int kDefaultCarrierHz = 38000;
+
 class DeviceProfile {
   String name;
   List<int> pattern;
+  int frequency;
 
-  DeviceProfile({required this.name, required this.pattern});
+  DeviceProfile({
+    required this.name,
+    required this.pattern,
+    this.frequency = kDefaultCarrierHz,
+  });
 
-  Map<String, dynamic> toJson() => {'name': name, 'pattern': pattern};
+  Map<String, dynamic> toJson() =>
+      {'name': name, 'pattern': pattern, 'frequency': frequency};
 
   factory DeviceProfile.fromJson(Map<String, dynamic> json) {
     return DeviceProfile(
       name: json['name'],
       pattern: List<int>.from(json['pattern']),
+      // Older profiles were saved without a frequency key.
+      frequency: json['frequency'] as int? ?? kDefaultCarrierHz,
     );
   }
 

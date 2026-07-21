@@ -76,7 +76,8 @@ class _MainScreenState extends State<MainScreen>
       return;
     }
     try {
-      final ok = await _taskController.schedule(data, pattern);
+      final ok = await _taskController.schedule(data, pattern,
+          frequency: _profileController.currentFrequency);
       if (ok) {
         final successMsg = switch (data.mode) {
           'recurring' => AppStrings.get('alarmSetOk'),
@@ -110,7 +111,8 @@ class _MainScreenState extends State<MainScreen>
 
   Future<void> _transmitWithFeedback(List<int> pattern) async {
     try {
-      final ok = await _taskController.transmit(pattern);
+      final ok = await _taskController.transmit(pattern,
+          frequency: _profileController.currentFrequency);
       _snack(ok ? AppStrings.get('testSent') : AppStrings.get('testFailed'),
           ok ? AppColors.success : AppColors.danger);
     } catch (e) {

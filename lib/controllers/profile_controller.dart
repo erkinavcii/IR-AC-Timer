@@ -51,6 +51,9 @@ class ProfileController extends ChangeNotifier {
   List<int>? parseCurrentPattern() =>
       tryParseIrPattern(patternController.text);
 
+  /// Carrier frequency of the selected profile (default if none selected).
+  int get currentFrequency => selectedProfile?.frequency ?? kDefaultCarrierHz;
+
   Future<void> select(DeviceProfile? p) async {
     if (p == null) return;
     _applySelection(p);
@@ -58,23 +61,25 @@ class ProfileController extends ChangeNotifier {
     await _service.saveSelectedProfileName(p.name);
   }
 
-  Future<String?> add(String name, List<int> pattern) async {
+  Future<String?> add(String name, List<int> pattern,
+      {int frequency = kDefaultCarrierHz}) async {
     if (name.isEmpty) return null;
     if (profiles.any((p) => p.name.toLowerCase() == name.toLowerCase())) {
       return 'profileExists';
     }
-    final np = DeviceProfile(name: name, pattern: pattern);
+    final np = DeviceProfile(name: name, pattern: pattern, frequency: frequency);
     profiles = List.from(profiles)..add(np);
     await _service.saveProfiles(profiles);
     await select(np);
     return null;
   }
 
-  Future<void> edit(DeviceProfile old, String newName, List<int> newPattern) async {
+  Future<void> edit(DeviceProfile old, String newName, List<int> newPattern,
+      {int frequency = kDefaultCarrierHz}) async {
     if (newName.isEmpty) return;
     profiles = profiles
         .map((p) => p.name == old.name
-            ? DeviceProfile(name: newName, pattern: newPattern)
+            ? DeviceProfile(name: newName, pattern: newPattern, frequency: frequency)
             : p)
         .toList();
     await _service.saveProfiles(profiles);
@@ -96,7 +101,7 @@ class ProfileController extends ChangeNotifier {
     if (current == null) return null;
     final pattern = parseCurrentPattern();
     if (pattern == null) return 'invalidPattern';
-    await edit(current, current.name, pattern);
+    await edit(current, current.name, pattern, frequency: current.frequency);
     return null;
   }
 

@@ -57,8 +57,10 @@ class IrPlatformService {
     return jsonDecode(taskStr) as Map<String, dynamic>;
   }
 
-  Future<bool> transmitIr(List<int> pattern) async =>
-      await _channel.invokeMethod('transmitIr', {'pattern': pattern})
+  Future<bool> transmitIr(List<int> pattern,
+          {int frequency = kDefaultCarrierHz}) async =>
+      await _channel.invokeMethod(
+          'transmitIr', {'pattern': pattern, 'frequency': frequency})
           as bool? ??
       false;
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/device_profile.dart';
 import '../services/ir_platform_service.dart';
 import '../utils/countdown_format.dart' as fmt;
 
@@ -81,13 +82,15 @@ class TaskController extends ChangeNotifier {
     }
   }
 
-  Future<bool> schedule(TaskSetupData data, List<int> pattern) async {
+  Future<bool> schedule(TaskSetupData data, List<int> pattern,
+      {int frequency = kDefaultCarrierHz}) async {
     final args = <String, dynamic>{
       'mode': data.mode,
       'targetHour': data.targetHour,
       'targetMinute': data.targetMinute,
       'durationMinutes': data.durationMinutes,
       'pattern': pattern,
+      'frequency': frequency,
     };
     if (data.mode == 'cycle') {
       args['cycleIntervalMinutes'] = data.cycleIntervalMinutes;
@@ -110,7 +113,9 @@ class TaskController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> transmit(List<int> pattern) => _service.transmitIr(pattern);
+  Future<bool> transmit(List<int> pattern,
+          {int frequency = kDefaultCarrierHz}) =>
+      _service.transmitIr(pattern, frequency: frequency);
 
   void _updateCountdown() {
     _countdownTimer?.cancel();

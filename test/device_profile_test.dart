@@ -14,5 +14,25 @@ void main() {
       expect(DeviceProfile.defaultPresets, isNotEmpty);
       expect(DeviceProfile.defaultPresets.first.pattern, isNotEmpty);
     });
+
+    test('parses legacy JSON without a frequency key (defaults to 38 kHz)', () {
+      final restored = DeviceProfile.fromJson({
+        'name': 'Legacy',
+        'pattern': [1, 2, 3],
+      });
+      expect(restored.frequency, kDefaultCarrierHz);
+    });
+
+    test('round-trips an explicit frequency', () {
+      final original =
+          DeviceProfile(name: 'Panasonic', pattern: [1, 2], frequency: 36000);
+      expect(DeviceProfile.fromJson(original.toJson()).frequency, 36000);
+    });
+
+    test('default presets carry the default carrier frequency', () {
+      for (final p in DeviceProfile.defaultPresets) {
+        expect(p.frequency, kDefaultCarrierHz);
+      }
+    });
   });
 }
