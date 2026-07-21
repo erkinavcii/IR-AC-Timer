@@ -31,6 +31,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 val frequency = taskJson.optInt("frequency", AppConstants.DEFAULT_CARRIER_HZ)
                 // 3× redundant burst on scheduled fires for reliability
                 IrTransmitter.transmitBurst(context, pattern, frequency)
+                StatsStore.record(context, mode)
             } else {
                 Log.e(TAG, "IR Pattern is empty!")
             }

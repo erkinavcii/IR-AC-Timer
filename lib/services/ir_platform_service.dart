@@ -87,4 +87,11 @@ class IrPlatformService {
 
   Future<void> setLanguage(String lang) =>
       _channel.invokeMethod('setLanguage', {'lang': lang});
+
+  Future<List<dynamic>> getStats() async {
+    final String raw = await _channel.invokeMethod('getStats') as String? ?? '[]';
+    return jsonDecode(raw) as List<dynamic>;
+  }
+
+  Future<void> resetStats() => _channel.invokeMethod('resetStats');
 }

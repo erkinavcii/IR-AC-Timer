@@ -134,6 +134,18 @@ class AppStrings {
     'profileExists':  {'tr': 'Bu isimde profil var.',                 'en': 'Profile name already exists.'},
     'minOneProfile':  {'tr': 'En az bir profil olmalı.',              'en': 'At least one profile required.'},
     'autostartFail':  {'tr': 'Ayarlar açılamadı. Manuel deneyin.',   'en': 'Could not open settings. Try manually.'},
+
+    // ── Usage statistics ───────────────────────────────────
+    'statsTitle':     {'tr': 'Kullanım İstatistikleri',               'en': 'Usage Statistics'},
+    'statsTotal':     {'tr': 'Toplam Gönderim',                       'en': 'Total Signals'},
+    'statsLast7':     {'tr': 'Son 7 Gün',                             'en': 'Last 7 Days'},
+    'statsLast':      {'tr': 'Son Gönderim',                          'en': 'Last Signal'},
+    'statsNever':     {'tr': 'Henüz yok',                             'en': 'None yet'},
+    'statsSaved':     {'tr': 'Tahmini Kapalı Kalma',                  'en': 'Est. Time Off'},
+    'statsSavedNote': {'tr': 'Zamanlanmış her kapatma için ~3 saat varsayılan tahmindir.', 'en': 'Rough estimate: ~3 h assumed per scheduled shutoff.'},
+    'statsHours':     {'tr': 'saat',                                  'en': 'h'},
+    'statsReset':     {'tr': 'İstatistikleri Sıfırla',                'en': 'Reset Statistics'},
+    'statsResetOk':   {'tr': 'İstatistikler sıfırlandı.',             'en': 'Statistics reset.'},
   };
 
   static String get(String key) => _t[key]?[_lang] ?? _t[key]?['tr'] ?? key;

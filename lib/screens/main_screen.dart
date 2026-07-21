@@ -12,6 +12,7 @@ import '../widgets/active_task_view.dart';
 import '../widgets/find_my_ac_wizard.dart';
 import '../widgets/profiles_section.dart';
 import '../widgets/setup_view.dart';
+import '../widgets/stats_section.dart';
 import '../widgets/status_row.dart';
 import '../widgets/xiaomi_card.dart';
 
@@ -245,6 +246,8 @@ class _MainScreenState extends State<MainScreen>
                     onTestTransmit: _testTransmit,
                     onSnack: _snack,
                   ),
+                  const SizedBox(height: 16),
+                  StatsSection(service: _service, onSnack: _snack),
                   const SizedBox(height: 16),
                   if (activeTask == null) ...[
                     FindMyAcCard(

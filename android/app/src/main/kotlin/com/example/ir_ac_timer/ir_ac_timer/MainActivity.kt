@@ -112,6 +112,13 @@ class MainActivity : FlutterActivity() {
                         .edit().putString(AppConstants.KEY_LANGUAGE, lang).apply()
                     result.success(true)
                 }
+                "getStats" -> {
+                    result.success(StatsStore.getRaw(this))
+                }
+                "resetStats" -> {
+                    StatsStore.reset(this)
+                    result.success(true)
+                }
                 else -> result.notImplemented()
             }
         }
