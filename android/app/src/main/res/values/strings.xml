@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default (English) strings used by background notifications. The
+         in-app UI is localized separately via lib/l10n/app_strings.dart;
+         these are resolved natively because AlarmReceiver/BootReceiver can
+         re-post the notification with no Flutter engine running. -->
+    <string name="cycle_channel_name">AC Cycle Timer</string>
+    <string name="cycle_channel_desc">Shown while an indefinite cycle is active</string>
+    <string name="cycle_notif_title">🔁 AC Timer — Indefinite Cycle Active</string>
+    <!-- %1$d = interval minutes, %2$s = next trigger time (HH:mm) -->
+    <string name="cycle_notif_text">Signal every %1$d min · Next: %2$s</string>
+    <string name="cycle_notif_stop">STOP</string>
+</resources>

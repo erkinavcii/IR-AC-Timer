@@ -296,6 +296,7 @@ class _MainScreenState extends State<MainScreen>
           onTap: () {
             final next = AppStrings.isTr ? 'en' : 'tr';
             MyApp.langNotifier.value = next;
+            _service.setLanguage(next);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

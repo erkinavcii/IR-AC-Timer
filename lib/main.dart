@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'l10n/app_strings.dart';
+import 'services/ir_platform_service.dart';
 import 'splash_screen.dart';
 import 'theme/app_colors.dart';
 
@@ -12,13 +13,23 @@ export 'screens/main_screen.dart';
 // ─────────────────────────────────────────────────────────────
 // Entry Point
 // ─────────────────────────────────────────────────────────────
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
     systemNavigationBarColor: AppColors.bg,
     systemNavigationBarIconBrightness: Brightness.light,
   ));
+  // Load the saved language before the first frame so the splash and UI
+  // open in the user's chosen language.
+  try {
+    final lang = await IrPlatformService().getLanguage();
+    AppStrings.setLang(lang);
+    MyApp.langNotifier.value = lang;
+  } catch (_) {
+    // Falls back to the default language on any channel error.
+  }
   runApp(const MyApp());
 }
 

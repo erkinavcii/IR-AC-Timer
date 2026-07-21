@@ -6,27 +6,44 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
+import java.util.Locale
 
 /**
  * Helper object for managing the persistent cycle notification.
  *
- * Shown only when an INDEFINITE cycle (no end time) is active,
- * so the user always has a visible reminder + quick-cancel entry
- * in the notification shade.
+ * Shown only when an INDEFINITE cycle (no end time) is active, so the user
+ * always has a visible reminder + a one-tap Stop action in the shade.
+ *
+ * Strings are resolved against the in-app language preference (not the
+ * device locale) so background re-posts from AlarmReceiver/BootReceiver —
+ * which run with no Flutter engine — still match what the user picked.
  */
 object NotificationHelper {
     const val CHANNEL_ID = "ir_ac_cycle_channel"
     const val NOTIFICATION_ID = 1002
 
+    /** A Context whose resources resolve to the saved in-app language. */
+    private fun localizedContext(context: Context): Context {
+        val lang = AppConstants.prefs(context)
+            .getString(AppConstants.KEY_LANGUAGE, AppConstants.DEFAULT_LANGUAGE)
+            ?: AppConstants.DEFAULT_LANGUAGE
+        val config = Configuration(context.resources.configuration).apply {
+            setLocale(Locale(lang))
+        }
+        return context.createConfigurationContext(config)
+    }
+
     fun createChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val loc = localizedContext(context)
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "AC Döngü Zamanlayıcı",
+                loc.getString(R.string.cycle_channel_name),
                 NotificationManager.IMPORTANCE_LOW   // Silent but visible
             ).apply {
-                description = "Sonsuz döngü aktif olduğunda gösterilir"
+                description = loc.getString(R.string.cycle_channel_desc)
                 setShowBadge(false)
                 enableLights(false)
                 enableVibration(false)
@@ -37,7 +54,12 @@ object NotificationHelper {
     }
 
     fun showCycleNotification(context: Context, intervalMin: Int, nextTriggerEpoch: Long) {
+        val loc = localizedContext(context)
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Refresh the channel so its localized name/description follow a
+        // mid-session language change.
+        createChannel(context)
 
         // Tap notification → open app
         val openIntent = Intent(context, MainActivity::class.java).apply {
@@ -46,41 +68,52 @@ object NotificationHelper {
         val openPendingIntent =
             PendingIntent.getActivity(context, 0, openIntent, AlarmScheduler.pendingIntentFlags())
 
-        // Format next trigger time
-        val nextTime = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date(nextTriggerEpoch))
+        // Stop action → cancel task without opening the app
+        val stopIntent = Intent(context, StopTaskReceiver::class.java)
+        val stopPendingIntent = PendingIntent.getBroadcast(
+            context, AppConstants.REQUEST_CODE_STOP_ACTION, stopIntent,
+            AlarmScheduler.pendingIntentFlags()
+        )
 
-        val notification = buildNotification(context, intervalMin, nextTime, openPendingIntent)
+        val nextTime = java.text.SimpleDateFormat("HH:mm", Locale.getDefault())
+            .format(java.util.Date(nextTriggerEpoch))
+        val title = loc.getString(R.string.cycle_notif_title)
+        val text = loc.getString(R.string.cycle_notif_text, intervalMin, nextTime)
+        val stopLabel = loc.getString(R.string.cycle_notif_stop)
+
+        val notification = buildNotification(
+            context, title, text, stopLabel, openPendingIntent, stopPendingIntent
+        )
         nm.notify(NOTIFICATION_ID, notification)
     }
 
     private fun buildNotification(
         context: Context,
-        intervalMin: Int,
-        nextTime: String,
-        contentIntent: PendingIntent
+        title: String,
+        text: String,
+        stopLabel: String,
+        contentIntent: PendingIntent,
+        stopIntent: PendingIntent
     ): Notification {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                .setContentTitle("🔁 AC Timer — Sonsuz Döngü Aktif")
-                .setContentText("Her ${intervalMin}dk'da bir sinyal · Sonraki: $nextTime")
-                .setSubText("Durdurmak için dokunun")
-                .setOngoing(true)
-                .setShowWhen(false)
-                .setContentIntent(contentIntent)
-                .build()
         } else {
             @Suppress("DEPRECATION")
             Notification.Builder(context)
-                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                .setContentTitle("🔁 AC Timer — Sonsuz Döngü Aktif")
-                .setContentText("Her ${intervalMin}dk'da bir sinyal · Sonraki: $nextTime")
-                .setOngoing(true)
-                .setShowWhen(false)
-                .setContentIntent(contentIntent)
-                .build()
         }
+        return builder
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setOngoing(true)
+            .setShowWhen(false)
+            .setContentIntent(contentIntent)
+            .addAction(
+                Notification.Action.Builder(
+                    android.R.drawable.ic_menu_close_clear_cancel, stopLabel, stopIntent
+                ).build()
+            )
+            .build()
     }
 
     fun cancelNotification(context: Context) {

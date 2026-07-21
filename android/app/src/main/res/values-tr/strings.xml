@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cycle_channel_name">AC Döngü Zamanlayıcı</string>
+    <string name="cycle_channel_desc">Sonsuz döngü aktif olduğunda gösterilir</string>
+    <string name="cycle_notif_title">🔁 AC Timer — Sonsuz Döngü Aktif</string>
+    <!-- %1$d = aralık (dakika), %2$s = sonraki tetikleme saati (HH:mm) -->
+    <string name="cycle_notif_text">Her %1$d dk\'da bir sinyal · Sonraki: %2$s</string>
+    <string name="cycle_notif_stop">DURDUR</string>
+</resources>

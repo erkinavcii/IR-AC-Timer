@@ -99,6 +99,16 @@ class MainActivity : FlutterActivity() {
                 "getSelectedProfile" -> {
                     result.success(AppConstants.prefs(this).getString(AppConstants.KEY_SELECTED_PROFILE, null))
                 }
+                "getLanguage" -> {
+                    result.success(AppConstants.prefs(this)
+                        .getString(AppConstants.KEY_LANGUAGE, AppConstants.DEFAULT_LANGUAGE))
+                }
+                "setLanguage" -> {
+                    val lang = call.argument<String>("lang") ?: AppConstants.DEFAULT_LANGUAGE
+                    AppConstants.prefs(this)
+                        .edit().putString(AppConstants.KEY_LANGUAGE, lang).apply()
+                    result.success(true)
+                }
                 else -> result.notImplemented()
             }
         }

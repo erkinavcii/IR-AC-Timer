@@ -79,4 +79,10 @@ class IrPlatformService {
 
   Future<void> saveSelectedProfileName(String name) =>
       _channel.invokeMethod('saveSelectedProfile', {'name': name});
+
+  Future<String> getLanguage() async =>
+      await _channel.invokeMethod('getLanguage') as String? ?? 'tr';
+
+  Future<void> setLanguage(String lang) =>
+      _channel.invokeMethod('setLanguage', {'lang': lang});
 }
