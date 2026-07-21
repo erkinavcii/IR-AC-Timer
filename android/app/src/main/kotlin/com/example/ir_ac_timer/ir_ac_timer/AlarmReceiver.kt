@@ -78,6 +78,9 @@ class AlarmReceiver : BroadcastReceiver() {
                     sharedPrefs.edit().remove(AppConstants.KEY_ACTIVE_TASK).apply()
                 }
             }
+
+            // Reflect the new next-trigger (or cleared task) on the widget
+            AcTimerWidgetProvider.refresh(context)
         } catch (e: Exception) {
             Log.e(TAG, "Error in AlarmReceiver: ${e.message}", e)
         }

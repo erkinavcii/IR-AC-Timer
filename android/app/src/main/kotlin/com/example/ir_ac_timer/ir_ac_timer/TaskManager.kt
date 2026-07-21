@@ -16,6 +16,7 @@ object TaskManager {
         AppConstants.prefs(context).edit().remove(AppConstants.KEY_ACTIVE_TASK).apply()
         // Always attempt to dismiss any lingering notification
         NotificationHelper.cancelNotification(context)
+        AcTimerWidgetProvider.refresh(context)
         Log.d(TAG, "Task cancelled.")
     }
 }

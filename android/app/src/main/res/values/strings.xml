@@ -10,4 +10,12 @@
     <!-- %1$d = interval minutes, %2$s = next trigger time (HH:mm) -->
     <string name="cycle_notif_text">Signal every %1$d min · Next: %2$s</string>
     <string name="cycle_notif_stop">STOP</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_title">AC Timer</string>
+    <string name="widget_off_button">AC OFF</string>
+    <!-- %1$s = next trigger time (HH:mm) or an em dash when idle -->
+    <string name="widget_next">Next: %1$s</string>
+    <string name="widget_next_none">—</string>
+    <string name="widget_no_ir">No IR blaster on this device</string>
 </resources>

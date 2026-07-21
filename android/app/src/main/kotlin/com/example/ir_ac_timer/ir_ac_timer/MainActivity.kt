@@ -261,6 +261,8 @@ class MainActivity : FlutterActivity() {
             NotificationHelper.showCycleNotification(this, cycleIntervalMin, firstTriggerTime)
         }
 
+        AcTimerWidgetProvider.refresh(this)
+
         Log.d(TAG, "Task scheduled: mode=$mode firstTrigger=${java.util.Date(firstTriggerTime)} endEpoch=$cycleEndEpoch")
         return true
     }

@@ -6,4 +6,12 @@
     <!-- %1$d = aralık (dakika), %2$s = sonraki tetikleme saati (HH:mm) -->
     <string name="cycle_notif_text">Her %1$d dk\'da bir sinyal · Sonraki: %2$s</string>
     <string name="cycle_notif_stop">DURDUR</string>
+
+    <!-- Ana ekran widget'ı -->
+    <string name="widget_title">AC Timer</string>
+    <string name="widget_off_button">AC KAPAT</string>
+    <!-- %1$s = sonraki tetikleme saati (HH:mm) ya da boşken tire -->
+    <string name="widget_next">Sonraki: %1$s</string>
+    <string name="widget_next_none">—</string>
+    <string name="widget_no_ir">Bu cihazda IR verici yok</string>
 </resources>
